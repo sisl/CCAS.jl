@@ -16,7 +16,7 @@ Dependencies:
 * LibCAS distribution
 
 
-CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining BOOST_ROOT in CMake.
+CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining the BOOST_ROOT environment variable.
 
 ```
 #!text
