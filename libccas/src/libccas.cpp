@@ -14,7 +14,6 @@ extern "C"
 
 libccas_EXPORT CConstants newCConstants(uint8 quant, const char* config_filename, uint32 max_intruders)
 {
-	cout << "Creating CConstants" << endl;
 	Constants* pConstants = new Constants();
 	pConstants->quant = quant;
 	pConstants->config_filename = config_filename;
@@ -33,7 +32,6 @@ libccas_EXPORT void delCConstants(CConstants cConstants)
 
 libccas_EXPORT CCASShared newCCASShared(CConstants cConstants, const char* library_path)
 {
-	cout << "Creating CCASShared" << endl;
 	Constants* pConstants = reinterpret_cast<Constants*>(cConstants);
 
 	return reinterpret_cast<CCASShared>(new CASShared(*pConstants, string(library_path)));
@@ -501,11 +499,11 @@ int main(int argc, const char* argv[])
 
 	cout << author() << endl;
 
-	const char* config_filename = "C:/Users/rcnlee/Documents/Visual Studio 2013/Projects/libccas/libccas/libcas/config/0.8.3.standard.r13.config.txt";
+	const char* config_filename = "../../../../libcas/parameters/0.8.3.standard.r13.config.txt";
 
 	CConstants cConstants = newCConstants(100, config_filename, 1);
 
-	const char* library_path = "C:/Users/rcnlee/Documents/Visual Studio 2013/Projects/libccas/libccas/libcas/lib/libcas.dll";
+	const char* library_path = "../../../../libcas/lib/libcas.dll";
 
 	CCASShared cCASShared = newCCASShared(cConstants, library_path);
 
