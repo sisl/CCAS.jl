@@ -2,7 +2,7 @@
 #include <string>
 #include "libccas.h"
 #include "../../libcas/interface/libcasshared.h"
-#include "build/libccas_Export.h"
+#include "libccas_Export.h"
 
 using namespace std;
 using namespace libcas;
@@ -555,6 +555,9 @@ int main(int argc, const char* argv[])
 	delCCollectionIntruderOutput(cIntruderOutputs);
 	delCOutput(cOutput);
 
+	cout << endl;
+	cout << "Done!" << endl;
+	cout << "Press any key to continue..." << endl;
 	getchar();
 	return 0;
 }
