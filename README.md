@@ -1,8 +1,8 @@
+Coming soon...
+
 # CCAS
 
 CCAS is a Julia wrapper for the MIT-LL libcas (ACASX) C library and interface.  (libcas not included)
-
-TODO
 
 ## Authors
 
@@ -10,7 +10,7 @@ Ritchie Lee, Ph.D. Student, ritchie.lee@sv.cmu.edu
 
 ## Installation
 
-TODO
+
 
 ```
 #!text
@@ -25,7 +25,6 @@ csrc/
 
 clib/
 
-TODO
 
 ```
 
