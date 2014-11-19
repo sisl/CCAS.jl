@@ -10,7 +10,13 @@ Ritchie Lee, Ph.D. Student, ritchie.lee@sv.cmu.edu
 
 ## Installation
 
+Dependencies: 
+* Boost C++ Libraries  >1.57.0
+* Boost::Extensions
+* LibCAS distribution
 
+
+CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining BOOST_ROOT in CMake.
 
 ```
 #!text
