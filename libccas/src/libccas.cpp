@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string>
 #include "libccas.h"
-#include "libcas/include/libcasshared.h"
+#include "../../libcas/interface/libcasshared.h"
 #include "build/libccas_Export.h"
 
 using namespace std;

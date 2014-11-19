@@ -1,7 +1,7 @@
 #ifndef LIBCCAS_H
 #define LIBCCAS_H
 
-#include "libcas/include/libcasshared.h"
+#include "../../libcas/interface/libcasshared.h"
 #include "build/libccas_Export.h"
 
 using namespace std;
