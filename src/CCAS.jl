@@ -1,7 +1,10 @@
 module CCAS
 
-export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders, OwnInputVals,
-         OwnInput, set!, IntruderInputVals, IntruderInput, CollectionIntruderInput,
+PACKAGE_PATH = Pkg.dir("CCAS")
+const LIBCCAS = joinpath(PACKAGE_PATH,"libccas/lib/libccas")
+
+export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders,
+         OwnInputVals, OwnInput, set!, get!, IntruderInputVals, IntruderInput, CollectionIntruderInput,
          size, InputVals, Input, IntruderOutputVals, IntruderOutput, CollectionIntruderOutput,
          OutputVals, Output, update, author
 
@@ -11,8 +14,6 @@ import Base.size
 import Base.getindex
 import Base.reset
 
-const libccas = "D:/bin/Debug/libccas"
-
 immutable Equipage
   EQUIPAGE_ATCRBS::Int32
   EQUIPAGE_MODES::Int32
@@ -20,10 +21,10 @@ immutable Equipage
   EQUIPAGE_TCAS::Int32
 
   function Equipage()
-    atcrbs = ccall((:enum_EQUIPAGE_ATCRBS,libccas),Int32,())
-    modes = ccall((:enum_EQUIPAGE_MODES,libccas),Int32,())
-    tcasta = ccall((:enum_EQUIPAGE_TCASTA,libccas),Int32,())
-    tcas = ccall((:enum_EQUIPAGE_TCAS,libccas),Int32,())
+    atcrbs = ccall((:enum_EQUIPAGE_ATCRBS,LIBCCAS),Int32,())
+    modes = ccall((:enum_EQUIPAGE_MODES,LIBCCAS),Int32,())
+    tcasta = ccall((:enum_EQUIPAGE_TCASTA,LIBCCAS),Int32,())
+    tcas = ccall((:enum_EQUIPAGE_TCAS,LIBCCAS),Int32,())
 
     return new(atcrbs, modes, tcasta, tcas)
   end
@@ -37,9 +38,10 @@ type Constants
   function Constants(quant_::Integer,config_filename::String,max_intruders_::Integer)
     quant = checked_convert(Uint8,quant_)
     max_intruders = checked_convert(Uint8,max_intruders_)
-    handle = ccall((:newCConstants,libccas), Ptr{Void}, (Uint8,Ptr{Uint8},Uint32), quant, config_filename, max_intruders)
+    handle = ccall((:newCConstants,LIBCCAS), Ptr{Void}, (Uint8,Ptr{Uint8},Uint32),
+                   quant, config_filename, max_intruders)
     obj = new(handle)
-    finalizer(obj,obj->ccall((:delCConstants,libccas),Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCConstants,LIBCCAS),Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
@@ -49,25 +51,26 @@ type CASShared
   handle::Ptr{Void} #Pointer to C object
 
   function CASShared(consts::Constants,library_path::String)
-    handle = ccall((:newCCASShared,libccas), Ptr{Void}, (Ptr{Void},Ptr{Uint8}), consts.handle, library_path)
+    handle = ccall((:newCCASShared,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Uint8}),
+                   consts.handle, library_path)
     obj = new(handle)
-    finalizer(obj,obj->ccall((:delCCASShared,libccas),Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCCASShared,LIBCCAS),Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
-reset(cas::CASShared) = ccall((:reset,libccas),Void,(Ptr{Void},),cas.handle)
+reset(cas::CASShared) = ccall((:reset,LIBCCAS),Void,(Ptr{Void},),cas.handle)
 
-version(cas::CASShared) = bytestring(ccall((:version,libccas),Ptr{Uint8},(Ptr{Void},),cas.handle))
+version(cas::CASShared) = bytestring(ccall((:version,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle))
 
 function error_msg(cas::CASShared)
-  err = ccall((:error,libccas),Ptr{Uint8},(Ptr{Void},),cas.handle)
+  err = ccall((:error,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle)
 
   return err == C_NULL ? nothing : bytestring(err)
 end
 
-max_intruders(cas::CASShared) = ccall((:max_intruders,libccas),Int64,(Ptr{Void},),cas.handle)
+max_intruders(cas::CASShared) = ccall((:max_intruders,LIBCCAS),Int64,(Ptr{Void},),cas.handle)
 
 type OwnInputVals
   dz::Float64
@@ -89,16 +92,16 @@ type OwnInput
 
   function OwnInput(dz::Float64,z::Float64,psi::Float64,h::Float64,modes::Uint32)
     obj         = new()
-    obj.handle  = ccall((:newCOwnInput,libccas), Ptr{Void},
+    obj.handle  = ccall((:newCOwnInput,LIBCCAS), Ptr{Void},
                    (Float64,Float64,Float64,Float64,Uint32), dz, z, psi, h, modes)
-    finalizer(obj,obj->ccall((:delCOwnInput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCOwnInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
-function set!(inputVals::OwnInputVals,input::OwnInput)
-  ccall((:setCOwnInput,libccas), Void,
+function set!(input::OwnInput,inputVals::OwnInputVals)
+  ccall((:setCOwnInput,LIBCCAS), Void,
         (Ptr{Void},Float64,Float64,Float64,Float64,Uint32), input.handle, inputVals.dz, inputVals.z,
         inputVals.psi, inputVals.h, inputVals.modes)
 end
@@ -146,26 +149,26 @@ end
 type IntruderInput
   handle::Ptr{Void}
 
-  IntruderInput() = IntruderInput(false,uint32(0),uint32(0),0.,0.,0.,uint8(0),uint8(0),uint8(0),int32(0),
-                            uint8(0),uint8(0),uint8(0))
+  IntruderInput() = IntruderInput(false,uint32(0),uint32(0),0.,0.,0.,uint8(0),uint8(0),uint8(0),
+                                  int32(0),uint8(0),uint8(0),uint8(0))
 
   function IntruderInput(valid::Bool,id::Uint32,modes::Uint32,sr::Float64,chi::Float64,z::Float64,
                          cvc::Uint8,vrc::Uint8,vsb::Uint8,equipage::Int32,quant::Uint8,
                          sensitivity_index::Uint8,protection_mode::Uint8)
     obj = new()
-    obj.handle = ccall((:newCIntruderInput,libccas), Ptr{Void},
+    obj.handle = ccall((:newCIntruderInput,LIBCCAS), Ptr{Void},
                    (Bool,Uint32, Uint32, Float64, Float64, Float64,
                     Uint8, Uint8, Uint8, Int32, Uint8,
                     Uint8, Uint8), valid, id, modes, sr, chi, z, cvc, vrc, vsb, equipage, quant,
                    sensitivity_index, protection_mode)
-    finalizer(obj,obj->ccall((:delCIntruderInput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCIntruderInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
 function set!(input::IntruderInput,inputVals::IntruderInputVals)
-  ccall((:setCIntruderInput,libccas), Void,
+  ccall((:setCIntruderInput,LIBCCAS), Void,
         (Ptr{Void},Bool,Uint32, Uint32, Float64, Float64, Float64,
          Uint8, Uint8, Uint8, Int32, Uint8,
          Uint8, Uint8), input.handle,inputVals.valid, inputVals.id,
@@ -181,7 +184,7 @@ type CollectionIntruderInput
 
   function CollectionIntruderInput(nintruders::Int)
     obj                = new()
-    obj.handle         = ccall((:newCCollectionIntruderInput,libccas), Ptr{Void}, ())
+    obj.handle         = ccall((:newCCollectionIntruderInput,LIBCCAS), Ptr{Void}, ())
     obj.intruders      = IntruderInput[IntruderInput() for i = 1:nintruders]
 
     resize!(obj,nintruders)
@@ -190,7 +193,7 @@ type CollectionIntruderInput
       setIndex!(obj,i,obj.intruders[i])
     end
 
-    finalizer(obj,obj->ccall((:delCCollectionIntruderInput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCCollectionIntruderInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
@@ -198,12 +201,12 @@ end
 
 function resize!(collection::CollectionIntruderInput,size_::Integer)
   size = checked_convert(Uint32,size_)
-  ccall((:resizeCCollectionIntrInput,libccas), Void, (Ptr{Void},Uint32), collection.handle, size)
+  ccall((:resizeCCollectionIntrInput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
 end
 
 function getIndex(collection::CollectionIntruderInput,index_::Integer)
   index = checked_convert(Uint32, index_-1) #C uses 0 indexing
-  handle = ccall((:getIndexCCollectionIntrInput,libccas), Ptr{Void}, (Ptr{Void},Uint32),
+  handle = ccall((:getIndexCCollectionIntrInput,LIBCCAS), Ptr{Void}, (Ptr{Void},Uint32),
                  collection.handle, index)
 
   return handle
@@ -211,12 +214,12 @@ end
 
 function setIndex!(collection::CollectionIntruderInput,index_::Integer,input::IntruderInput)
   index = checked_convert(Uint32,index_-1) #C uses 0 indexing
-  ccall((:setIndexCCollectionIntrInput,libccas), Void, (Ptr{Void},Uint32,Ptr{Void}),
+  ccall((:setIndexCCollectionIntrInput,LIBCCAS), Void, (Ptr{Void},Uint32,Ptr{Void}),
                  collection.handle, index, input.handle)
 end
 
 function size(collection::CollectionIntruderInput)
-  csize = ccall((:sizeCCollectionIntrInput,libccas), Uint32, (Ptr{Void},),
+  csize = ccall((:sizeCCollectionIntrInput,LIBCCAS), Uint32, (Ptr{Void},),
                  collection.handle)
   csize = convert(Int64,csize)
   @test csize == length(collection.intruders) #make sure we're in sync
@@ -248,19 +251,20 @@ type Input
 
   function Input(ownInput::OwnInput,intruders_collection::CollectionIntruderInput)
     obj = new()
-    obj.handle = ccall((:newCInput,libccas), Ptr{Void}, (Ptr{Void},Ptr{Void}), ownInput.handle,
+    obj.handle = ccall((:newCInput,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Void}), ownInput.handle,
                    intruders_collection.handle)
     obj.ownInput = ownInput
     obj.intruders_collection = intruders_collection
-    finalizer(obj,obj->ccall((:delCInput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
 function set!(input::Input,inputVals::InputVals)
-  set!(inputVals.ownInput,input.ownInput)
-  for (inputVals_intruder,input_intruder) in zip(inputVals.intruders,input.intruders_collection.intruders)
+  set!(input.ownInput,inputVals.ownInput)
+  for (inputVals_intruder,input_intruder) in zip(inputVals.intruders,
+                                                 input.intruders_collection.intruders)
     set!(input_intruder,inputVals_intruder)
   end
 end
@@ -295,22 +299,22 @@ type IntruderOutput
 
   function IntruderOutput(id::Uint32,cvc::Uint8,vrc::Uint8,vsb::Uint8,tds::Float64,code::Uint8)
     obj           = new()
-    obj.handle    = ccall((:newCIntruderOutput,libccas), Ptr{Void},
+    obj.handle    = ccall((:newCIntruderOutput,LIBCCAS), Ptr{Void},
                           (Uint32, Uint8, Uint8, Uint8, Float64, Uint8), id, cvc, vrc, vsb,
                           tds, code)
-    finalizer(obj,obj->ccall((:delCIntruderOutput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCIntruderOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
 function get!(output::IntruderOutput,outputVals::IntruderOutputVals)
-  outputVals.id = ccall((:getCIntrOutput_id,libccas), Uint32, (Ptr{Void},), output.handle)
-  outputVals.cvc = ccall((:getCIntrOutput_cvc,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.vrc = ccall((:getCIntrOutput_vrc,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.vsb = ccall((:getCIntrOutput_vsb,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.tds = ccall((:getCIntrOutput_tds,libccas), Float64, (Ptr{Void},), output.handle)
-  outputVals.code = ccall((:getCIntrOutput_code,libccas), Uint8, (Ptr{Void},), output.handle)
+  outputVals.id = ccall((:getCIntrOutput_id,LIBCCAS), Uint32, (Ptr{Void},), output.handle)
+  outputVals.cvc = ccall((:getCIntrOutput_cvc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.vrc = ccall((:getCIntrOutput_vrc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.vsb = ccall((:getCIntrOutput_vsb,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.tds = ccall((:getCIntrOutput_tds,LIBCCAS), Float64, (Ptr{Void},), output.handle)
+  outputVals.code = ccall((:getCIntrOutput_code,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
 
   return outputVals
 end
@@ -321,7 +325,7 @@ type CollectionIntruderOutput
 
   function CollectionIntruderOutput(nintruders::Int)
     obj             = new()
-    obj.handle      = ccall((:newCCollectionIntruderOutput,libccas), Ptr{Void}, ())
+    obj.handle      = ccall((:newCCollectionIntruderOutput,LIBCCAS), Ptr{Void}, ())
     obj.intruders   = IntruderOutput[IntruderOutput() for i = 1:nintruders]
 
     resize!(obj,nintruders)
@@ -330,7 +334,7 @@ type CollectionIntruderOutput
       setIndex!(obj,i,obj.intruders[i])
     end
 
-    finalizer(obj,obj->ccall((:delCCollectionIntruderOutput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCCollectionIntruderOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
@@ -338,23 +342,23 @@ end
 
 function resize!(collection::CollectionIntruderOutput,size_::Integer)
   size = checked_convert(Uint32,size_)
-  ccall((:resizeCCollectionIntrOutput,libccas), Void, (Ptr{Void},Uint32), collection.handle, size)
+  ccall((:resizeCCollectionIntrOutput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
 end
 
 function getIndex(collection::CollectionIntruderOutput,index_::Integer)
   index = checked_convert(Uint32, index_-1) #C uses 0 indexing
-  return ccall((:getIndexCCollectionIntrOutput,libccas), Ptr{Void}, (Ptr{Void},Uint32),
+  return ccall((:getIndexCCollectionIntrOutput,LIBCCAS), Ptr{Void}, (Ptr{Void},Uint32),
                  collection.handle, index)
 end
 
 function setIndex!(collection::CollectionIntruderOutput,index_::Integer,input::IntruderOutput)
   index = checked_convert(Uint32,index_-1) #C uses 0 indexing
-  ccall((:setIndexCCollectionIntrOutput,libccas), Void, (Ptr{Void},Uint32,Ptr{Void}),
+  ccall((:setIndexCCollectionIntrOutput,LIBCCAS), Void, (Ptr{Void},Uint32,Ptr{Void}),
                  collection.handle, index, input.handle)
 end
 
 function size(collection::CollectionIntruderOutput)
-  csize = ccall((:sizeCCollectionIntrOutput,libccas), Uint32, (Ptr{Void},),
+  csize = ccall((:sizeCCollectionIntrOutput,LIBCCAS), Uint32, (Ptr{Void},),
                  collection.handle)
   csize = convert(Int64,csize)
   @test csize == length(collection.intruders) #make sure we're in sync
@@ -385,8 +389,9 @@ type OutputVals
                0.,0.,uint8(0),0.,intruders)
   end
 
-  function OutputVals(cc::Uint8,vc::Uint8,ua::Uint8,da::Uint8,target_rate::Float64,turn_off_aurals::Bool,
-                      crossing::Bool,alarm::Bool,alert::Bool,dh_min::Float64,dh_max::Float64,
+  function OutputVals(cc::Uint8,vc::Uint8,ua::Uint8,da::Uint8,target_rate::Float64,
+                      turn_off_aurals::Bool,crossing::Bool,alarm::Bool,alert::Bool,
+                      dh_min::Float64,dh_max::Float64,
                       sensitivity_index::Uint8,ddh::Float64,
                       intruders::Vector{IntruderOutputVals})
     obj                    = new()
@@ -423,33 +428,33 @@ type Output
                       intruder_collection::CollectionIntruderOutput)
 
     obj           = new()
-    obj.handle    = ccall((:newCOutput,libccas), Ptr{Void},
-                          (Uint8,Uint8,Uint8,Uint8,Float64,Bool,Bool,Bool,Bool,Float64,Float64,Uint8,Float64,
-                           Ptr{Void}),
+    obj.handle    = ccall((:newCOutput,LIBCCAS), Ptr{Void},
+                          (Uint8,Uint8,Uint8,Uint8,Float64,Bool,Bool,Bool,Bool,Float64,Float64,
+                           Uint8,Float64,Ptr{Void}),
                           cc, vc, ua, da, target_rate, turn_off_aurals,
                           crossing, alarm, alert, dh_min, dh_max,
                           sensitivity_index, ddh, intruder_collection.handle)
     obj.intruder_collection   = intruder_collection
-    finalizer(obj,obj->ccall((:delCOutput,libccas), Void, (Ptr{Void},),obj.handle))
+    finalizer(obj,obj->ccall((:delCOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
 function get!(output::Output,outputVals::OutputVals)
-  outputVals.cc       = ccall((:getCOutput_cc,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.vc       = ccall((:getCOutput_vc,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.ua       = ccall((:getCOutput_ua,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.da       = ccall((:getCOutput_da,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.target_rate       = ccall((:getCOutput_target_rate,libccas), Float64, (Ptr{Void},), output.handle)
-  outputVals.turn_off_aurals   = ccall((:getCOutput_turn_off_aurals,libccas), Bool, (Ptr{Void},), output.handle)
-  outputVals.crossing          = ccall((:getCOutput_crossing,libccas), Bool, (Ptr{Void},), output.handle)
-  outputVals.alarm    = ccall((:getCOutput_alarm,libccas), Bool, (Ptr{Void},), output.handle)
-  outputVals.alert    = ccall((:getCOutput_alert,libccas), Bool, (Ptr{Void},), output.handle)
-  outputVals.dh_min   = ccall((:getCOutput_dh_min,libccas), Float64, (Ptr{Void},), output.handle)
-  outputVals.dh_max   = ccall((:getCOutput_dh_max,libccas), Float64, (Ptr{Void},), output.handle)
-  outputVals.sensitivity_index = ccall((:getCOutput_sensitivity_index,libccas), Uint8, (Ptr{Void},), output.handle)
-  outputVals.ddh      = ccall((:getCOutput_ddh,libccas), Float64, (Ptr{Void},), output.handle)
+  outputVals.cc       = ccall((:getCOutput_cc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.vc       = ccall((:getCOutput_vc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.ua       = ccall((:getCOutput_ua,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.da       = ccall((:getCOutput_da,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.target_rate       = ccall((:getCOutput_target_rate,LIBCCAS), Float64, (Ptr{Void},), output.handle)
+  outputVals.turn_off_aurals   = ccall((:getCOutput_turn_off_aurals,LIBCCAS), Bool, (Ptr{Void},), output.handle)
+  outputVals.crossing          = ccall((:getCOutput_crossing,LIBCCAS), Bool, (Ptr{Void},), output.handle)
+  outputVals.alarm    = ccall((:getCOutput_alarm,LIBCCAS), Bool, (Ptr{Void},), output.handle)
+  outputVals.alert    = ccall((:getCOutput_alert,LIBCCAS), Bool, (Ptr{Void},), output.handle)
+  outputVals.dh_min   = ccall((:getCOutput_dh_min,LIBCCAS), Float64, (Ptr{Void},), output.handle)
+  outputVals.dh_max   = ccall((:getCOutput_dh_max,LIBCCAS), Float64, (Ptr{Void},), output.handle)
+  outputVals.sensitivity_index = ccall((:getCOutput_sensitivity_index,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.ddh      = ccall((:getCOutput_ddh,LIBCCAS), Float64, (Ptr{Void},), output.handle)
 
   for (out,outVals) in zip(output.intruder_collection.intruders,outputVals.intruders)
     get!(out,outVals)
@@ -459,58 +464,15 @@ function get!(output::Output,outputVals::OutputVals)
 end
 
 function update(cas::CASShared,input::Input,output::Output)
-  ccall((:update,libccas),Void,(Ptr{Void},Ptr{Void},Ptr{Void}),cas.handle,input.handle,output.handle)
+  ccall((:update,LIBCCAS),Void,(Ptr{Void},Ptr{Void},Ptr{Void}),cas.handle,input.handle,output.handle)
 end
 
 function checked_convert{T <: Unsigned}(::Type{T},n::Integer)
-  return (typemin(T) <= n <= typemax(T)) ? convert(T,n) : error("Cannot convert numeric type: Out of range")
+  return (typemin(T) <= n <= typemax(T)) ?
+    convert(T,n) : error("Cannot convert numeric type: Out of range")
 end
 
-author() = bytestring(ccall((:author,libccas),Ptr{Uint8},()))
-
-function unittest()
-  println(author())
-
-  config_filename = "D:/svn/sisl-rcnlee/SISLES_MCTS/libcas/run13_parameters_20140911/0.8.3.standard.r13.config.txt"
-  consts = Constants(25, config_filename, 1)
-
-  library_path = "D:/svn/sisl-rcnlee/SISLES_MCTS/libcas/libcas.0.8.3_win64_20140911/Release/libcas.dll"
-  cas = CASShared(consts,library_path)
-
-  errorMsg = error_msg(cas)
-  println( errorMsg == nothing ? "No Errors" : errorMsg )
-
-  println(version(cas))
-  println("max_intruders: ", max_intruders(cas))
-
-  nintruders = max_intruders(cas)
-  input = Input(nintruders)
-  inputVals = InputVals(nintruders)
-  output = Output(nintruders)
-  outputVals = OutputVals(nintruders)
-
-  reset(cas)
-  for t = 1:5
-    println("\nt = ", t)
-
-    inputVals.ownInput.dz = 0.1
-    inputVals.ownInput.z = 0.1t
-    inputVals.intruders[1].valid = true
-    inputVals.intruders[1].sr = 0.2t
-    inputVals.intruders[1].z = 0.1t
-    set!(input,inputVals)
-
-    update(cas,input,output)
-
-    get!(output,outputVals)
-
-    xdump(outputVals)
-    xdump(outputVals.intruders[1])
-  end
+author() = bytestring(ccall((:author,LIBCCAS),Ptr{Uint8},()))
 
 end
 
-end
-
-#TODOs:
-# check for nulls before ccalls?
