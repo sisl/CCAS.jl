@@ -36,12 +36,15 @@ for t = 1:5
 
   get!(output,outputVals)
 
+  xdump(inputVals.ownInput)
+  xdump(inputVals.intruders[1])
   xdump(outputVals)
   xdump(outputVals.intruders[1])
 
   errorMsg = error_msg(cas)
   println( errorMsg == nothing ? "No Errors" : errorMsg )
 
+  gc()
 end
 
 println()
