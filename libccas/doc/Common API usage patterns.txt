@@ -1,0 +1,24 @@
+//Order of calls
+
+// cas system objects
+newCConstants() //create a new constants object
+newCCASShared() //create CAS object and open library
+
+// input objects
+newCInput() //create a new input object. members are auto-allocated
+getRefCOwnInput() //get reference to the allocated OwnInput
+getRefCollectionIntruderInput() //get reference to allocated intruder collection
+resizeCCollectionIntrInput() //default size is 0, resize to number of intruders. Collection will allocate
+getRefCIntruderInput() //get reference to the specific intruder object
+
+// output objects
+newCOutput() //create a new output object. members are auto-allocated
+getRefCCollectionIntruderOutput() //get reference to allocated intruder collection
+resizeCCollectionIntrOutput //default size is 0, resize to number of intruders. Collection will allocate
+getRefCIntruderOutput //get reference to the specific intruder object
+
+// deallocate
+delCConstants()
+delCCASShared() 
+delCInput() //Note: Collection will handle dealloc of its records
+delCOutput() //Note: Collection will handle dealloc of its records

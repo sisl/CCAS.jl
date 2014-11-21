@@ -34,6 +34,8 @@ libccas_EXPORT void reset(CCASShared cCASShared);
 
 libccas_EXPORT COwnInput newCOwnInput(real dz, real z, real psi, real h, uint32 modes);
 
+libccas_EXPORT COwnInput getCOwnInput(CInput cInput);
+
 libccas_EXPORT void delCOwnInput(COwnInput cOwnInput);
 
 libccas_EXPORT void setCOwnInput(COwnInput cOwnInput, real dz, real z, real psi, real h, uint32 modes);
@@ -44,13 +46,17 @@ libccas_EXPORT CIntruderInput newCIntruderInput(bool valid, uint32 id, uint32 mo
 
 libccas_EXPORT void delCIntruderInput(CIntruderInput cIntruderInput);
 
+libccas_EXPORT CIntruderInput getRefCIntruderInput(CCollectionIntruderInput cCollection, uint32 index);
+
 libccas_EXPORT CCollectionIntruderInput newCCollectionIntruderInput();
+
+libccas_EXPORT void delCCollectionIntruderInput(CCollectionIntruderInput cCollection);
+
+libccas_EXPORT CCollectionIntruderInput getRefCCollectionIntruderInput(CInput cInput);
 
 libccas_EXPORT void setCIntruderInput(CIntruderInput cIntruderInput, bool valid, uint32 id,
 	uint32 modes, real sr, real chi, real z, uint8 cvc, uint8 vrc, uint8 vsb, int equipage,
 	uint8 quant, uint8 sensitivity_index, uint8 protection_mode);
-
-libccas_EXPORT void delCCollectionIntruderInput(CCollectionIntruderInput cCollection);
 
 libccas_EXPORT void resizeCCollectionIntrInput(CCollectionIntruderInput cCollection, uint32 size);
 
@@ -60,13 +66,17 @@ libccas_EXPORT void setIndexCCollectionIntrInput(CCollectionIntruderInput cColle
 
 libccas_EXPORT uint32 sizeCCollectionIntrInput(CCollectionIntruderInput cCollection);
 
-libccas_EXPORT CInput newCInput(COwnInput cOwnInput, CCollectionIntruderInput cintruders);
+libccas_EXPORT CInput newCInput();
 
 libccas_EXPORT void delCInput(CInput cInput);
 
 libccas_EXPORT CIntruderOutput newCIntruderOutput(uint32 id, uint8 cvc, uint8 vrc, uint8 vsb, real tds, uint8 code);
 
 libccas_EXPORT void delCIntruderOutput(CIntruderOutput cIntruderOutput);
+
+libccas_EXPORT CIntruderOutput getRefCIntruderOutput(CCollectionIntruderOutput cCollection, uint32 index);
+
+libccas_EXPORT void setCIntrOutput_id(CIntruderOutput cIntruderOutput, uint32 id);
 
 libccas_EXPORT uint32 getCIntrOutput_id(CIntruderOutput cIntruderOutput);
 
@@ -84,6 +94,8 @@ libccas_EXPORT CCollectionIntruderOutput newCCollectionIntruderOutput();
 
 libccas_EXPORT void delCCollectionIntruderOutput(CCollectionIntruderOutput cCollection);
 
+libccas_EXPORT CCollectionIntruderOutput getRefCCollectionIntruderOutput(COutput cOutput);
+
 libccas_EXPORT void resizeCCollectionIntrOutput(CCollectionIntruderOutput cCollection, uint32 size);
 
 libccas_EXPORT CIntruderOutput getIndexCCollectionIntrOutput(CCollectionIntruderOutput cCollection, uint32 index);
@@ -92,9 +104,7 @@ libccas_EXPORT void setIndexCCollectionIntrOutput(CCollectionIntruderOutput cCol
 
 libccas_EXPORT uint32 sizeCCollectionIntrOutput(CCollectionIntruderOutput cCollection);
 
-libccas_EXPORT COutput newCOutput(uint8 cc, uint8 vc, uint8 ua, uint8 da, real target_rate, bool turn_off_aurals,
-	bool crossing, bool alarm, bool alert, real dh_min, real dh_max,
-	uint8 sensitivity_index, real ddh, CCollectionIntruderOutput cintruder);
+libccas_EXPORT COutput newCOutput();
 
 libccas_EXPORT void delCOutput(COutput cOutput);
 
@@ -125,6 +135,10 @@ libccas_EXPORT uint8 getCOutput_sensitivity_index(COutput cOutput);
 libccas_EXPORT real getCOutput_ddh(COutput cOutput);
 
 libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput);
+
+libccas_EXPORT void print_CInput(CInput cInput);
+
+libccas_EXPORT void print_COutput(COutput cOutput);
 
 libccas_EXPORT const char* version(CCASShared cCASShared);
 

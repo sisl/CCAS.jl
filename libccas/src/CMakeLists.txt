@@ -17,7 +17,7 @@ generate_export_header(libccas
 		STATIC_DEFINE libccas_BUILT_AS_STATIC)
 
 
-install(TARGETS libccas CONFIGURATIONS Release
+install(TARGETS libccas CONFIGURATIONS Debug Release
 		RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/../lib
 		LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/../lib
 		ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/../lib)

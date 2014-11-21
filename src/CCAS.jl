@@ -6,7 +6,7 @@ const LIBCCAS = joinpath(PACKAGE_PATH,"libccas/lib/libccas")
 export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders,
          OwnInputVals, OwnInput, set!, get!, IntruderInputVals, IntruderInput, CollectionIntruderInput,
          size, InputVals, Input, IntruderOutputVals, IntruderOutput, CollectionIntruderOutput,
-         OutputVals, Output, update, author
+         OutputVals, Output, set_id!, update, author
 
 using Base.Test
 import Base.resize!
@@ -85,27 +85,6 @@ type OwnInputVals
     new(dz,z,psi,h,checked_convert(Uint32,modes))
 end
 
-type OwnInput
-  handle::Ptr{Void}
-
-  OwnInput() = OwnInput(0.,0.,0.,0.,uint32(0))
-
-  function OwnInput(dz::Float64,z::Float64,psi::Float64,h::Float64,modes::Uint32)
-    obj         = new()
-    obj.handle  = ccall((:newCOwnInput,LIBCCAS), Ptr{Void},
-                   (Float64,Float64,Float64,Float64,Uint32), dz, z, psi, h, modes)
-    finalizer(obj,obj->ccall((:delCOwnInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-function set!(input::OwnInput,inputVals::OwnInputVals)
-  ccall((:setCOwnInput,LIBCCAS), Void,
-        (Ptr{Void},Float64,Float64,Float64,Float64,Uint32), input.handle, inputVals.dz, inputVals.z,
-        inputVals.psi, inputVals.h, inputVals.modes)
-end
-
 type IntruderInputVals
   valid::Bool
   id::Uint32
@@ -146,87 +125,6 @@ type IntruderInputVals
   end
 end
 
-type IntruderInput
-  handle::Ptr{Void}
-
-  IntruderInput() = IntruderInput(false,uint32(0),uint32(0),0.,0.,0.,uint8(0),uint8(0),uint8(0),
-                                  int32(0),uint8(0),uint8(0),uint8(0))
-
-  function IntruderInput(valid::Bool,id::Uint32,modes::Uint32,sr::Float64,chi::Float64,z::Float64,
-                         cvc::Uint8,vrc::Uint8,vsb::Uint8,equipage::Int32,quant::Uint8,
-                         sensitivity_index::Uint8,protection_mode::Uint8)
-    obj = new()
-    obj.handle = ccall((:newCIntruderInput,LIBCCAS), Ptr{Void},
-                   (Bool,Uint32, Uint32, Float64, Float64, Float64,
-                    Uint8, Uint8, Uint8, Int32, Uint8,
-                    Uint8, Uint8), valid, id, modes, sr, chi, z, cvc, vrc, vsb, equipage, quant,
-                   sensitivity_index, protection_mode)
-    finalizer(obj,obj->ccall((:delCIntruderInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-function set!(input::IntruderInput,inputVals::IntruderInputVals)
-  ccall((:setCIntruderInput,LIBCCAS), Void,
-        (Ptr{Void},Bool,Uint32, Uint32, Float64, Float64, Float64,
-         Uint8, Uint8, Uint8, Int32, Uint8,
-         Uint8, Uint8), input.handle,inputVals.valid, inputVals.id,
-        inputVals.modes, inputVals.sr,
-        inputVals.chi, inputVals.z,
-        inputVals.cvc, inputVals.vrc, inputVals.vsb, inputVals.equipage, inputVals.quant,
-        inputVals.sensitivity_index, inputVals.protection_mode)
-end
-
-type CollectionIntruderInput
-  handle::Ptr{Void}
-  intruders::Vector{IntruderInput}
-
-  function CollectionIntruderInput(nintruders::Int)
-    obj                = new()
-    obj.handle         = ccall((:newCCollectionIntruderInput,LIBCCAS), Ptr{Void}, ())
-    obj.intruders      = IntruderInput[IntruderInput() for i = 1:nintruders]
-
-    resize!(obj,nintruders)
-
-    for i = 1:nintruders
-      setIndex!(obj,i,obj.intruders[i])
-    end
-
-    finalizer(obj,obj->ccall((:delCCollectionIntruderInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-function resize!(collection::CollectionIntruderInput,size_::Integer)
-  size = checked_convert(Uint32,size_)
-  ccall((:resizeCCollectionIntrInput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
-end
-
-function getIndex(collection::CollectionIntruderInput,index_::Integer)
-  index = checked_convert(Uint32, index_-1) #C uses 0 indexing
-  handle = ccall((:getIndexCCollectionIntrInput,LIBCCAS), Ptr{Void}, (Ptr{Void},Uint32),
-                 collection.handle, index)
-
-  return handle
-end
-
-function setIndex!(collection::CollectionIntruderInput,index_::Integer,input::IntruderInput)
-  index = checked_convert(Uint32,index_-1) #C uses 0 indexing
-  ccall((:setIndexCCollectionIntrInput,LIBCCAS), Void, (Ptr{Void},Uint32,Ptr{Void}),
-                 collection.handle, index, input.handle)
-end
-
-function size(collection::CollectionIntruderInput)
-  csize = ccall((:sizeCCollectionIntrInput,LIBCCAS), Uint32, (Ptr{Void},),
-                 collection.handle)
-  csize = convert(Int64,csize)
-  @test csize == length(collection.intruders) #make sure we're in sync
-
-  return csize
-end
-
 type InputVals
   ownInput::OwnInputVals
   intruders::Vector{IntruderInputVals}
@@ -242,31 +140,124 @@ type InputVals
   InputVals(ownInput::OwnInputVals,intruders::Vector{IntruderInputVals}) = new(ownInput,intruders)
 end
 
+type OwnInput
+  handle::Ptr{Void}
+end
+
+type IntruderInput
+  handle::Ptr{Void}
+end
+
+type CollectionIntruderInput
+  handle::Ptr{Void}
+  intruders::Vector{IntruderInput}
+
+  function CollectionIntruderInput(handle::Ptr{Void})
+    obj = new()
+    obj.handle = handle
+    obj.intruders = IntruderInput[]
+
+    return obj
+  end
+end
+
 type Input
   handle::Ptr{Void}
   ownInput::OwnInput
-  intruders_collection::CollectionIntruderInput
+  intruder_collection::CollectionIntruderInput
 
-  Input(nintruders::Int) = Input(OwnInput(),CollectionIntruderInput(nintruders))
-
-  function Input(ownInput::OwnInput,intruders_collection::CollectionIntruderInput)
+  function Input(nintruders::Int)
     obj = new()
-    obj.handle = ccall((:newCInput,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Void}), ownInput.handle,
-                   intruders_collection.handle)
-    obj.ownInput = ownInput
-    obj.intruders_collection = intruders_collection
+    obj.handle = ccall((:newCInput,LIBCCAS), Ptr{Void}, ())
+
+    obj.ownInput = OwnInput(obj)
+    obj.intruder_collection = CollectionIntruderInput(obj,nintruders)
+
     finalizer(obj,obj->ccall((:delCInput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
 end
 
+function OwnInput(input::Input,ownInputVals::Union(OwnInputVals,Nothing)=nothing)
+
+  handle  = ccall((:getRefCOwnInput,LIBCCAS), Ptr{Void},(Ptr{Void},), input.handle)
+  obj = OwnInput(handle)
+
+  if ownInputVals != nothing
+    set!(obj,ownInputVals)
+  end
+
+  return obj
+end
+
+function IntruderInput(collection::CollectionIntruderInput,index_::Integer,
+                       inputVals::Union(IntruderInputVals,Nothing)=nothing)
+  index = checked_convert(Uint32, index_-1) #C uses 0 indexing
+
+  handle = ccall((:getRefCIntruderInput,LIBCCAS), Ptr{Void},
+                 (Ptr{Void},Uint32), collection.handle, index)
+  obj = IntruderInput(handle)
+
+  if inputVals != nothing
+    set!(obj,inputVals)
+  end
+
+  return obj
+end
+
+function CollectionIntruderInput(input::Input,nintruders::Int)
+  handle         = ccall((:getRefCCollectionIntruderInput,LIBCCAS), Ptr{Void},
+                             (Ptr{Void},),input.handle)
+  obj = CollectionIntruderInput(handle)
+
+  resize!(obj,nintruders)
+  resize!(obj.intruders,nintruders)
+
+  for i = 1:nintruders
+    obj.intruders[i]      = IntruderInput(obj,i)
+  end
+
+  return obj
+end
+
+function set!(input::OwnInput,inputVals::OwnInputVals)
+  ccall((:setCOwnInput,LIBCCAS), Void,
+        (Ptr{Void},Float64,Float64,Float64,Float64,Uint32), input.handle, inputVals.dz, inputVals.z,
+        inputVals.psi, inputVals.h, inputVals.modes)
+end
+
+function set!(input::IntruderInput,inputVals::IntruderInputVals)
+  ccall((:setCIntruderInput,LIBCCAS), Void,
+        (Ptr{Void},Bool,Uint32, Uint32, Float64, Float64, Float64,
+         Uint8, Uint8, Uint8, Int32, Uint8,
+         Uint8, Uint8), input.handle,inputVals.valid, inputVals.id,
+        inputVals.modes, inputVals.sr,
+        inputVals.chi, inputVals.z,
+        inputVals.cvc, inputVals.vrc, inputVals.vsb, inputVals.equipage, inputVals.quant,
+        inputVals.sensitivity_index, inputVals.protection_mode)
+end
+
 function set!(input::Input,inputVals::InputVals)
   set!(input.ownInput,inputVals.ownInput)
-  for (inputVals_intruder,input_intruder) in zip(inputVals.intruders,
-                                                 input.intruders_collection.intruders)
+  for (input_intruder,inputVals_intruder) in zip(input.intruder_collection.intruders,
+                                                 inputVals.intruders)
     set!(input_intruder,inputVals_intruder)
   end
+end
+
+function resize!(collection::CollectionIntruderInput,size_::Integer)
+  size = checked_convert(Uint32,size_)
+  ccall((:resizeCCollectionIntrInput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
+end
+
+function size(collection::CollectionIntruderInput)
+  csize = ccall((:sizeCCollectionIntrInput,LIBCCAS), Uint32, (Ptr{Void},),
+                 collection.handle)
+  csize = convert(Int64,csize)
+  @test csize == length(collection.intruders) #make sure we're in sync
+
+  return csize
 end
 
 type IntruderOutputVals
@@ -292,80 +283,6 @@ type IntruderOutputVals
   end
 end
 
-type IntruderOutput
-  handle::Ptr{Void}
-
-  IntruderOutput() = IntruderOutput(uint32(0),uint8(0),uint8(0),uint8(0),0.,uint8(0))
-
-  function IntruderOutput(id::Uint32,cvc::Uint8,vrc::Uint8,vsb::Uint8,tds::Float64,code::Uint8)
-    obj           = new()
-    obj.handle    = ccall((:newCIntruderOutput,LIBCCAS), Ptr{Void},
-                          (Uint32, Uint8, Uint8, Uint8, Float64, Uint8), id, cvc, vrc, vsb,
-                          tds, code)
-    finalizer(obj,obj->ccall((:delCIntruderOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-function get!(output::IntruderOutput,outputVals::IntruderOutputVals)
-  outputVals.id = ccall((:getCIntrOutput_id,LIBCCAS), Uint32, (Ptr{Void},), output.handle)
-  outputVals.cvc = ccall((:getCIntrOutput_cvc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
-  outputVals.vrc = ccall((:getCIntrOutput_vrc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
-  outputVals.vsb = ccall((:getCIntrOutput_vsb,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
-  outputVals.tds = ccall((:getCIntrOutput_tds,LIBCCAS), Float64, (Ptr{Void},), output.handle)
-  outputVals.code = ccall((:getCIntrOutput_code,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
-
-  return outputVals
-end
-
-type CollectionIntruderOutput
-  handle::Ptr{Void}
-  intruders::Vector{IntruderOutput}
-
-  function CollectionIntruderOutput(nintruders::Int)
-    obj             = new()
-    obj.handle      = ccall((:newCCollectionIntruderOutput,LIBCCAS), Ptr{Void}, ())
-    obj.intruders   = IntruderOutput[IntruderOutput() for i = 1:nintruders]
-
-    resize!(obj,nintruders)
-
-    for i = 1:nintruders
-      setIndex!(obj,i,obj.intruders[i])
-    end
-
-    finalizer(obj,obj->ccall((:delCCollectionIntruderOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-function resize!(collection::CollectionIntruderOutput,size_::Integer)
-  size = checked_convert(Uint32,size_)
-  ccall((:resizeCCollectionIntrOutput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
-end
-
-function getIndex(collection::CollectionIntruderOutput,index_::Integer)
-  index = checked_convert(Uint32, index_-1) #C uses 0 indexing
-  return ccall((:getIndexCCollectionIntrOutput,LIBCCAS), Ptr{Void}, (Ptr{Void},Uint32),
-                 collection.handle, index)
-end
-
-function setIndex!(collection::CollectionIntruderOutput,index_::Integer,input::IntruderOutput)
-  index = checked_convert(Uint32,index_-1) #C uses 0 indexing
-  ccall((:setIndexCCollectionIntrOutput,LIBCCAS), Void, (Ptr{Void},Uint32,Ptr{Void}),
-                 collection.handle, index, input.handle)
-end
-
-function size(collection::CollectionIntruderOutput)
-  csize = ccall((:sizeCCollectionIntrOutput,LIBCCAS), Uint32, (Ptr{Void},),
-                 collection.handle)
-  csize = convert(Int64,csize)
-  @test csize == length(collection.intruders) #make sure we're in sync
-
-  return csize
-end
-
 type OutputVals
   cc::Uint8
   vc::Uint8
@@ -381,34 +298,27 @@ type OutputVals
   sensitivity_index::Uint8
   ddh::Float64
   intruders::Vector{IntruderOutputVals}
+end
 
-  function OutputVals(nintruders::Int)
+function OutputVals(nintruders::Int)
     intruders = IntruderOutputVals[IntruderOutputVals() for i=1:nintruders]
 
-    return new(uint8(0),uint8(0),uint8(0),uint8(0),0.,false,false,false,false,
+    return OutputVals(uint8(0),uint8(0),uint8(0),uint8(0),0.,false,false,false,false,
                0.,0.,uint8(0),0.,intruders)
   end
 
-  function OutputVals(cc::Uint8,vc::Uint8,ua::Uint8,da::Uint8,target_rate::Float64,
-                      turn_off_aurals::Bool,crossing::Bool,alarm::Bool,alert::Bool,
-                      dh_min::Float64,dh_max::Float64,
-                      sensitivity_index::Uint8,ddh::Float64,
-                      intruders::Vector{IntruderOutputVals})
-    obj                    = new()
-    obj.cc                 = cc
-    obj.vc                 = vc
-    obj.ua                 = ua
-    obj.da                 = da
-    obj.target_rate        = target_rate
-    obj.turn_off_aurals    = turn_off_aurals
-    obj.crossing           = crossing
-    obj.alarm              = alarm
-    obj.alert              = alert
-    obj.dh_min             = dh_min
-    obj.dh_max             = dh_max
-    obj.sensitivity_index  = sensitivity_index
-    obj.ddh                = ddh
-    obj.intruders          = intruders
+type IntruderOutput
+  handle::Ptr{Void}
+end
+
+type CollectionIntruderOutput
+  handle::Ptr{Void}
+  intruders::Vector{IntruderOutput}
+
+  function CollectionIntruderOutput(handle::Ptr{Void})
+    obj = new()
+    obj.handle = handle
+    obj.intruders = IntruderOutput[]
 
     return obj
   end
@@ -418,27 +328,62 @@ type Output
   handle::Ptr{Void}
   intruder_collection::CollectionIntruderOutput
 
-  Output(nintruders::Int) = Output(uint8(0),uint8(0),uint8(0),uint8(0),0.,
-                                   false,false,false,false,0.,0.,uint8(0),0.,
-                                   CollectionIntruderOutput(nintruders))
+  function Output(nintruders::Int)
+    obj = new()
+    obj.handle = ccall((:newCOutput,LIBCCAS), Ptr{Void}, ())
+    obj.intruder_collection = CollectionIntruderOutput(obj,nintruders)
 
-  function Output(cc::Uint8,vc::Uint8,ua::Uint8,da::Uint8,target_rate::Float64,turn_off_aurals::Bool,
-                      crossing::Bool,alarm::Bool,alert::Bool,dh_min::Float64,dh_max::Float64,
-                      sensitivity_index::Uint8,ddh::Float64,
-                      intruder_collection::CollectionIntruderOutput)
-
-    obj           = new()
-    obj.handle    = ccall((:newCOutput,LIBCCAS), Ptr{Void},
-                          (Uint8,Uint8,Uint8,Uint8,Float64,Bool,Bool,Bool,Bool,Float64,Float64,
-                           Uint8,Float64,Ptr{Void}),
-                          cc, vc, ua, da, target_rate, turn_off_aurals,
-                          crossing, alarm, alert, dh_min, dh_max,
-                          sensitivity_index, ddh, intruder_collection.handle)
-    obj.intruder_collection   = intruder_collection
     finalizer(obj,obj->ccall((:delCOutput,LIBCCAS), Void, (Ptr{Void},),obj.handle))
 
     return obj
   end
+end
+
+function IntruderOutput(collection::CollectionIntruderOutput,index_::Integer,
+                        outputVals::Union(IntruderOutputVals,Nothing)=nothing)
+  index = checked_convert(Uint32, index_-1) #C uses 0 indexing
+
+  handle = ccall((:getRefCIntruderOutput,LIBCCAS), Ptr{Void},
+                     (Ptr{Void},Uint32), collection.handle, index)
+  obj = IntruderOutput(handle)
+
+  if outputVals != nothing
+    set!(obj,outputVals)
+  end
+
+  return obj
+end
+
+function CollectionIntruderOutput(output::Output,nintruders::Int)
+  handle         = ccall((:getRefCCollectionIntruderOutput,LIBCCAS), Ptr{Void},
+                             (Ptr{Void},),output.handle)
+
+  obj = CollectionIntruderOutput(handle)
+
+  resize!(obj,nintruders)
+  resize!(obj.intruders,nintruders)
+
+  for i = 1:nintruders
+    obj.intruders[i]      = IntruderOutput(obj,i)
+  end
+
+  return obj
+end
+
+function set_id!(intruderOutput::IntruderOutput,id_::Integer)
+  id = checked_convert(Uint32,id_)
+  ccall((:setCIntrOutput_id,LIBCCAS), Void, (Ptr{Void},Uint32),intruderOutput.handle,id)
+end
+
+function get!(output::IntruderOutput,outputVals::IntruderOutputVals)
+  outputVals.id = ccall((:getCIntrOutput_id,LIBCCAS), Uint32, (Ptr{Void},), output.handle)
+  outputVals.cvc = ccall((:getCIntrOutput_cvc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.vrc = ccall((:getCIntrOutput_vrc,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.vsb = ccall((:getCIntrOutput_vsb,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+  outputVals.tds = ccall((:getCIntrOutput_tds,LIBCCAS), Float64, (Ptr{Void},), output.handle)
+  outputVals.code = ccall((:getCIntrOutput_code,LIBCCAS), Uint8, (Ptr{Void},), output.handle)
+
+  return outputVals
 end
 
 function get!(output::Output,outputVals::OutputVals)
@@ -461,6 +406,20 @@ function get!(output::Output,outputVals::OutputVals)
   end
 
   return outputVals
+end
+
+function resize!(collection::CollectionIntruderOutput,size_::Integer)
+  size = checked_convert(Uint32,size_)
+  ccall((:resizeCCollectionIntrOutput,LIBCCAS), Void, (Ptr{Void},Uint32), collection.handle, size)
+end
+
+function size(collection::CollectionIntruderOutput)
+  csize = ccall((:sizeCCollectionIntrOutput,LIBCCAS), Uint32, (Ptr{Void},),
+                 collection.handle)
+  csize = convert(Int64,csize)
+  @test csize == length(collection.intruders) #make sure we're in sync
+
+  return csize
 end
 
 function update(cas::CASShared,input::Input,output::Output)

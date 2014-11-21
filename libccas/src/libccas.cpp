@@ -72,6 +72,13 @@ libccas_EXPORT void delCOwnInput(COwnInput cOwnInput)
 	pOwnInput = NULL;
 }
 
+libccas_EXPORT COwnInput getRefCOwnInput(CInput cInput)
+{
+	Input* pInput = reinterpret_cast<Input*>(cInput);
+
+	return reinterpret_cast<COwnInput*>(&pInput->own);
+}
+
 libccas_EXPORT void setCOwnInput(COwnInput cOwnInput, real dz, real z, real psi, real h, uint32 modes)
 {
 	OwnInput* pOwnInput = reinterpret_cast<OwnInput*>(cOwnInput);
@@ -112,6 +119,13 @@ libccas_EXPORT void delCIntruderInput(CIntruderInput cIntruderInput)
 	pIntruderInput = NULL;
 }
 
+libccas_EXPORT CIntruderInput getRefCIntruderInput(CCollectionIntruderInput cCollection, uint32 index)
+{
+	Collection<IntruderInput>* pCollection = reinterpret_cast<Collection<IntruderInput>*>(cCollection);
+
+	return reinterpret_cast<IntruderInput*>(&((*pCollection)[index]));
+}
+
 libccas_EXPORT void setCIntruderInput(CIntruderInput cIntruderInput, bool valid, uint32 id, 
 	uint32 modes, real sr, real chi, real z, uint8 cvc, uint8 vrc, uint8 vsb, int equipage,
 	uint8 quant, uint8 sensitivity_index, uint8 protection_mode)
@@ -145,6 +159,13 @@ libccas_EXPORT void delCCollectionIntruderInput(CCollectionIntruderInput cCollec
 	pCollection = NULL;
 }
 
+libccas_EXPORT CCollectionIntruderInput getRefCCollectionIntruderInput(CInput cInput)
+{
+	Input* pInput = reinterpret_cast<Input*>(cInput);
+
+	return reinterpret_cast<CCollectionIntruderInput*>(&(pInput->intruder));
+}
+
 libccas_EXPORT void resizeCCollectionIntrInput(CCollectionIntruderInput cCollection, uint32 size)
 {
 	Collection<IntruderInput>* pCollection = reinterpret_cast<Collection<IntruderInput>*>(cCollection);
@@ -174,16 +195,9 @@ libccas_EXPORT uint32 sizeCCollectionIntrInput(CCollectionIntruderInput cCollect
 	return (uint32)pCollection->size(); //casted from size_t, possible loss of data
 }
 
-libccas_EXPORT CInput newCInput(COwnInput cOwnInput, CCollectionIntruderInput cIntruders)
+libccas_EXPORT CInput newCInput()
 {
-	OwnInput* pOwnInput = reinterpret_cast<OwnInput*>(cOwnInput);
-	Collection<IntruderInput>* pIntruders = reinterpret_cast<Collection<IntruderInput>*>(cIntruders);
-
-	Input* pInput = new Input();
-	pInput->own = *pOwnInput;
-	pInput->intruder = *pIntruders;
-
-	return reinterpret_cast<CInput>(pInput);
+	return reinterpret_cast<CInput>(new Input());
 }
 
 libccas_EXPORT void delCInput(CInput cInput)
@@ -212,6 +226,19 @@ libccas_EXPORT void delCIntruderOutput(CIntruderOutput cIntruderOutput)
 
 	delete pIntruderOutput;
 	pIntruderOutput = NULL;
+}
+
+libccas_EXPORT CIntruderOutput getRefCIntruderOutput(CCollectionIntruderOutput cCollection, uint32 index)
+{
+	Collection<IntruderOutput>* pCollection = reinterpret_cast<Collection<IntruderOutput>*>(cCollection);
+
+	return reinterpret_cast<IntruderInput*>(&((*pCollection)[index]));
+}
+
+libccas_EXPORT void setCIntrOutput_id(CIntruderOutput cIntruderOutput, uint32 id)
+{
+	IntruderOutput* pIntruderOutput = reinterpret_cast<IntruderOutput*>(cIntruderOutput);	
+	pIntruderOutput->id = id;
 }
 
 libccas_EXPORT uint32 getCIntrOutput_id(CIntruderOutput cIntruderOutput)
@@ -269,6 +296,13 @@ libccas_EXPORT void delCCollectionIntruderOutput(CCollectionIntruderOutput cColl
 	pCollection = NULL;
 }
 
+libccas_EXPORT CCollectionIntruderOutput getRefCCollectionIntruderOutput(COutput cOutput)
+{
+	Output* pOutput = reinterpret_cast<Output*>(cOutput);
+
+	return reinterpret_cast<CCollectionIntruderInput*>(&(pOutput->intruder));
+}
+
 libccas_EXPORT void resizeCCollectionIntrOutput(CCollectionIntruderOutput cCollection, uint32 size)
 {
 	Collection<IntruderOutput>* pCollection = reinterpret_cast<Collection<IntruderOutput>*>(cCollection);
@@ -298,29 +332,9 @@ libccas_EXPORT uint32 sizeCCollectionIntrOutput(CCollectionIntruderOutput cColle
 	return (uint32)pCollection->size(); //casted from size_t, possible loss of data
 }
 
-libccas_EXPORT COutput newCOutput(uint8 cc, uint8 vc, uint8 ua, uint8 da, real target_rate, bool turn_off_aurals,
-	bool crossing, bool alarm, bool alert, real dh_min, real dh_max,
-	uint8 sensitivity_index, real ddh, CCollectionIntruderOutput cCollection)
+libccas_EXPORT COutput newCOutput()
 {
-	Collection<IntruderOutput>* pCollection = reinterpret_cast<Collection<IntruderOutput>*>(cCollection);
-
-	Output* pOutput = new Output();
-	pOutput->cc = cc;
-	pOutput->vc = vc;
-	pOutput->ua = ua;
-	pOutput->da = da;
-	pOutput->target_rate = target_rate;
-	pOutput->turn_off_aurals = turn_off_aurals;
-	pOutput->crossing = crossing;
-	pOutput->alarm = alarm;
-	pOutput->alert = alert;
-	pOutput->dh_min = dh_min;
-	pOutput->dh_max = dh_max;
-	pOutput->sensitivity_index = sensitivity_index;
-	pOutput->ddh = ddh;
-	pOutput->intruder = *pCollection;
-
-	return reinterpret_cast<COutput>(pOutput);
+	return reinterpret_cast<COutput>(new Output());
 }
 
 libccas_EXPORT void delCOutput(COutput cOutput)
@@ -422,11 +436,16 @@ libccas_EXPORT real getCOutput_ddh(COutput cOutput)
 	return pOutput->ddh;
 }
 
+#define CCASDEBUG
 libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput)
 {
 	CASShared* pCASShared = reinterpret_cast<CASShared*>(cCASShared);
 	Input* pInput = reinterpret_cast<Input*>(cInput);
 	Output* pOutput = reinterpret_cast<Output*>(cOutput);
+
+#ifdef CCASDEBUG
+	print_CInput(cInput);
+#endif
 
 	try
 	{
@@ -439,6 +458,77 @@ libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput
 	catch (...)
 	{
 		cout << "Exception in update: general" << endl;
+	}
+
+#ifdef CCASDEBUG
+	print_COutput(cOutput);
+#endif
+}
+
+libccas_EXPORT void print_CInput(CInput cInput)
+{
+	Input* pInput = reinterpret_cast<Input*>(cInput);
+	cout << "Input" << endl;
+
+	//Print Ownship
+	cout << "Ownship:" << endl;
+	cout << "dz = " << pInput->own.dz << endl;
+	cout << "z = " << pInput->own.z << endl;
+	cout << "psi = " << pInput->own.psi << endl;
+	cout << "h = " << pInput->own.h << endl;
+	cout << "modes = " << pInput->own.modes << endl;
+
+	//Print intruders
+	for (int i = 0; i < pInput->intruder.size(); i++)
+	{
+		cout << "Intruder " << i << ":" << endl;
+		cout << "valid = " << pInput->intruder[i].valid << endl;
+		cout << "id = " << (int)pInput->intruder[i].id << endl;
+		cout << "modes = " << (int)pInput->intruder[i].modes << endl;
+		cout << "sr = " << pInput->intruder[i].sr << endl;
+		cout << "chi = " << pInput->intruder[i].chi << endl;
+		cout << "z = " << pInput->intruder[i].z << endl;
+		cout << "cvc = " << (int)pInput->intruder[i].cvc << endl;
+		cout << "vrc = " << (int)pInput->intruder[i].vrc << endl;
+		cout << "vsb = " << (int)pInput->intruder[i].vsb << endl;
+		cout << "equipage = " << (int)pInput->intruder[i].equipage << endl;
+		cout << "quant = " << (int)pInput->intruder[i].quant << endl;
+		cout << "sensitivity_index = " << (int)pInput->intruder[i].sensitivity_index << endl;
+		cout << "protection_mode = " << (int)pInput->intruder[i].protection_mode << endl;
+	}
+}
+
+libccas_EXPORT void print_COutput(COutput cOutput)
+{
+	Output* pOutput = reinterpret_cast<Output*>(cOutput);
+	cout << "Output" << endl;
+
+	//Print Ownship
+	cout << "Output:" << endl;
+	cout << "cc = " << (int)pOutput->cc << endl;
+	cout << "vc = " << (int)pOutput->vc << endl;
+	cout << "ua = " << (int)pOutput->ua << endl;
+	cout << "da = " << (int)pOutput->da << endl;
+	cout << "target_rate = " << pOutput->target_rate << endl;
+	cout << "turn_off_aurals = " << pOutput->turn_off_aurals << endl;
+	cout << "crossing = " << pOutput->crossing << endl;
+	cout << "alarm = " << pOutput->alarm << endl;
+	cout << "alert = " << pOutput->alert << endl;
+	cout << "dh_min = " << pOutput->dh_min << endl;
+	cout << "dh_max = " << pOutput->dh_max << endl;
+	cout << "sensitivity_index = " << (int)pOutput->sensitivity_index << endl;
+	cout << "ddh = " << pOutput->ddh << endl;
+
+	//Print intruders
+	for (int i = 0; i < pOutput->intruder.size(); i++)
+	{
+		cout << "Intruder " << i << ":" << endl;
+		cout << "id = " << (int)pOutput->intruder[i].id << endl;
+		cout << "cvc = " << (int)pOutput->intruder[i].cvc << endl;
+		cout << "vrc = " << (int)pOutput->intruder[i].vrc << endl;
+		cout << "vsb = " << (int)pOutput->intruder[i].vsb << endl;
+		cout << "tds = " << pOutput->intruder[i].tds << endl;
+		cout << "code = " << (int)pOutput->intruder[i].code << endl;
 	}
 }
 
@@ -466,7 +556,7 @@ libccas_EXPORT uint32 max_intruders(CCASShared cCASShared)
 
 libccas_EXPORT const char* author()
 {
-	const char* msg = "Written by Ritchie Lee";
+	const char* msg = "Written by Ritchie Lee\nritchie.lee@sv.cmu.edu";
 	cout << msg << endl;
 
 	return msg;
@@ -501,7 +591,7 @@ int main(int argc, const char* argv[])
 
 	const char* config_filename = "../../../../libcas/parameters/0.8.3.standard.r13.config.txt";
 
-	CConstants cConstants = newCConstants(100, config_filename, 1);
+	CConstants cConstants = newCConstants(25, config_filename, 1);
 
 	const char* library_path = "../../../../libcas/lib/libcas.dll";
 
@@ -514,45 +604,58 @@ int main(int argc, const char* argv[])
 	if (errorMsg == NULL)
 		cout << "No errors." << endl;
 	else
-		cout << "Error: " << errorMsg << endl;
+		cout << "Error: " << errorMsg << endl;	
 
-	reset(cCASShared);
+	CInput cInput = newCInput();
 
-	COwnInput cOwnInput = newCOwnInput(5.0, 10000.0, 0.1, 11000.0, 0x0);
+	COwnInput cOwnInput = getRefCOwnInput(cInput);
 
-	CIntruderInput cIntruderInput = newCIntruderInput(
-		false, 0x1, 0x1, 6000.0, 0.1, 10000.0, 0x0, 0x0, 0x0, enum_EQUIPAGE_TCAS(),
-		0x0, 0x0, 0x0);
-
-	IntruderInput* pIntruderIput = reinterpret_cast<IntruderInput*>(cIntruderInput);
-
-	CCollectionIntruderInput cIntruderInputs = newCCollectionIntruderInput();
+	CCollectionIntruderInput cIntruderInputs = getRefCCollectionIntruderInput(cInput);
 	resizeCCollectionIntrInput(cIntruderInputs, 1);
-	setIndexCCollectionIntrInput(cIntruderInputs, 0, cIntruderInput);
+	CIntruderInput cIntruderInput = getRefCIntruderInput(cIntruderInputs, 0);
 
-	CInput cInput = newCInput(cOwnInput, cIntruderInputs);
+	COutput cOutput = newCOutput();
 
-	CIntruderOutput cIntruderOutput = newCIntruderOutput(1, 0x0, 0x0, 0x0, 0.0, 0x0);
-
-	CCollectionIntruderOutput cIntruderOutputs = newCCollectionIntruderOutput();
+	CCollectionIntruderOutput cIntruderOutputs = getRefCCollectionIntruderOutput(cOutput);
 	resizeCCollectionIntrOutput(cIntruderOutputs, 1);
-	setIndexCCollectionIntrOutput(cIntruderOutputs, 0, cIntruderOutput);
+	CIntruderOutput cIntruderOutput = getRefCIntruderOutput(cIntruderOutputs, 0);
+	setCIntrOutput_id(cIntruderOutput, 100);
 
-	COutput cOutput = newCOutput(0x0, 0x0, 0x0, 0x0, 0.0, false, false, false,
-		false, 0.0, 0.0, 0x0, 0.0, cIntruderOutputs);
+	for (int i = 1; i <= 5; i++)
+	{
+		cout << endl;
+		cout << "i = " << i << endl;
 
-	update(cCASShared, cInput, cOutput);
+		reset(cCASShared);
 
-	Output* pOutput = reinterpret_cast<Output*>(cOutput);
+		for (int t = 1; t <= 1; t++)
+		{
+			cout << "t = " << t << endl;
+			//set input
+			setCOwnInput(cOwnInput, 0.0, 36000.0, 0.0, 36000.0, 0x123);
+			OwnInput* pOwnInput = reinterpret_cast<OwnInput*>(cOwnInput);
+			Input* pInput = reinterpret_cast<Input*>(cInput);
+
+			setCIntruderInput(cIntruderInput, false, 100,
+				0x456, 10000.0, 0.0, 10000, 0x0, 0x0, 0x0, enum_EQUIPAGE_ATCRBS(),
+				25, 0x0, 0x0);
+
+			// update
+			update(cCASShared, cInput, cOutput);
+
+			//get output
+			//cout << "[" << (int)getCOutput_cc(cOutput) << "," << (int)getCOutput_vc(cOutput) << ","
+			//	<< (int)getCOutput_ua(cOutput) << "," << (int)getCOutput_da(cOutput) << "]" << endl;
+			//cout << "target_rate=" << getCOutput_target_rate(cOutput) << endl;
+			//cout << "dh_min=" << getCOutput_dh_min(cOutput) 
+			//	<< ", dh_max=" << getCOutput_dh_max(cOutput) << endl;
+			//cout << "ddh=" << getCOutput_ddh(cOutput) << endl;
+		}
+	}
 
 	delCConstants(cConstants);
 	delCCASShared(cCASShared);
-	delCOwnInput(cOwnInput);
-	delCIntruderInput(cIntruderInput);
-	delCCollectionIntruderInput(cIntruderInputs);
 	delCInput(cInput);
-	delCIntruderOutput(cIntruderOutput);
-	delCCollectionIntruderOutput(cIntruderOutputs);
 	delCOutput(cOutput);
 
 	cout << endl;
