@@ -564,22 +564,22 @@ libccas_EXPORT const char* author()
 
 libccas_EXPORT int enum_EQUIPAGE_ATCRBS()
 {
-	return Equipage::EQUIPAGE_ATCRBS;
+	return EQUIPAGE_ATCRBS;
 }
 
 libccas_EXPORT int enum_EQUIPAGE_MODES()
 {
-	return Equipage::EQUIPAGE_MODES;
+	return EQUIPAGE_MODES;
 }
 
 libccas_EXPORT int enum_EQUIPAGE_TCASTA()
 {
-	return Equipage::EQUIPAGE_TCASTA;
+	return EQUIPAGE_TCASTA;
 }
 
 libccas_EXPORT int enum_EQUIPAGE_TCAS()
 {
-	return Equipage::EQUIPAGE_TCAS;
+	return EQUIPAGE_TCAS;
 }
 
 int main(int argc, const char* argv[])

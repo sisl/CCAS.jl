@@ -1,4 +1,4 @@
-﻿Build started 11/21/2014 2:29:21 PM.
+﻿Build started 11/21/2014 6:28:38 PM.
      1>Project "C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\libccas\libccas\libccas.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D _MBCS /D _MBCS /D libccas_BUILT_AS_STATIC /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt ..\..\..\src\libccas.cpp
@@ -10,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.89
+Time Elapsed 00:00:01.97
