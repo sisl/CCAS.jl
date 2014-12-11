@@ -156,6 +156,8 @@ libccas_EXPORT int enum_EQUIPAGE_TCASTA();
 
 libccas_EXPORT int enum_EQUIPAGE_TCAS();
 
+libccas_EXPORT void debug_main();
+
 #ifdef  __cplusplus
 }
 #endif

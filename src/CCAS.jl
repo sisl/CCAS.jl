@@ -4,9 +4,8 @@ PACKAGE_PATH = Pkg.dir("CCAS")
 const LIBCCAS = joinpath(PACKAGE_PATH,"libccas/lib/libccas")
 
 export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders,
-         OwnInputVals, OwnInput, set!, get!, IntruderInputVals, IntruderInput, CollectionIntruderInput,
-         size, InputVals, Input, IntruderOutputVals, IntruderOutput, CollectionIntruderOutput,
-         OutputVals, Output, set_id!, update, author
+         OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
+         OutputVals, update!, author
 
 using Base.Test
 import Base.resize!
@@ -31,46 +30,6 @@ immutable Equipage
 end
 
 EQUIPAGE = Equipage()
-
-type Constants
-  handle::Ptr{Void} #Pointer to C object
-
-  function Constants(quant_::Integer,config_filename::String,max_intruders_::Integer)
-    quant = checked_convert(Uint8,quant_)
-    max_intruders = checked_convert(Uint8,max_intruders_)
-    handle = ccall((:newCConstants,LIBCCAS), Ptr{Void}, (Uint8,Ptr{Uint8},Uint32),
-                   quant, config_filename, max_intruders)
-    obj = new(handle)
-    finalizer(obj,obj->ccall((:delCConstants,LIBCCAS),Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-type CASShared
-  handle::Ptr{Void} #Pointer to C object
-
-  function CASShared(consts::Constants,library_path::String)
-    handle = ccall((:newCCASShared,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Uint8}),
-                   consts.handle, library_path)
-    obj = new(handle)
-    finalizer(obj,obj->ccall((:delCCASShared,LIBCCAS),Void, (Ptr{Void},),obj.handle))
-
-    return obj
-  end
-end
-
-reset(cas::CASShared) = ccall((:reset,LIBCCAS),Void,(Ptr{Void},),cas.handle)
-
-version(cas::CASShared) = bytestring(ccall((:version,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle))
-
-function error_msg(cas::CASShared)
-  err = ccall((:error,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle)
-
-  return err == C_NULL ? nothing : bytestring(err)
-end
-
-max_intruders(cas::CASShared) = ccall((:max_intruders,LIBCCAS),Int64,(Ptr{Void},),cas.handle)
 
 type OwnInputVals
   dz::Float64
@@ -421,9 +380,69 @@ function size(collection::CollectionIntruderOutput)
 
   return csize
 end
+type Constants
+  handle::Ptr{Void} #Pointer to C object
+
+  function Constants(quant_::Integer,config_filename::String,max_intruders_::Integer)
+    quant = checked_convert(Uint8,quant_)
+    max_intruders = checked_convert(Uint8,max_intruders_)
+    handle = ccall((:newCConstants,LIBCCAS), Ptr{Void}, (Uint8,Ptr{Uint8},Uint32),
+                   quant, config_filename, max_intruders)
+    obj = new(handle)
+    finalizer(obj,obj->ccall((:delCConstants,LIBCCAS),Void, (Ptr{Void},),obj.handle))
+
+    return obj
+  end
+end
+
+type CASShared
+  handle::Ptr{Void} #Pointer to C object
+  max_intruders::Int64
+  input::Input
+  output::Output
+
+  function CASShared(consts::Constants,library_path::String)
+    handle = ccall((:newCCASShared,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Uint8}),
+                   consts.handle, library_path)
+    obj = new(handle)
+    obj.max_intruders = max_intruders(obj)
+    obj.input = Input(max_intruders)
+    obj.output = Output(max_intruders)
+
+    finalizer(obj,obj->ccall((:delCCASShared,LIBCCAS),Void, (Ptr{Void},),obj.handle))
+
+    return obj
+  end
+end
+
+reset(cas::CASShared) = ccall((:reset,LIBCCAS),Void,(Ptr{Void},),cas.handle)
+
+version(cas::CASShared) = bytestring(ccall((:version,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle))
+
+function error_msg(cas::CASShared)
+  err = ccall((:error,LIBCCAS),Ptr{Uint8},(Ptr{Void},),cas.handle)
+
+  return err == C_NULL ? nothing : bytestring(err)
+end
+
+max_intruders(cas::CASShared) = ccall((:max_intruders,LIBCCAS),Int64,(Ptr{Void},),cas.handle)
 
 function update(cas::CASShared,input::Input,output::Output)
   ccall((:update,LIBCCAS),Void,(Ptr{Void},Ptr{Void},Ptr{Void}),cas.handle,input.handle,output.handle)
+end
+
+function update!(cas::CASShared,inputVals::InputVals,outputVals::OutputVals)
+
+  #id in output isn't populated by libcas for some reason, so we'll do it on our end
+  for i = 1:cas.max_intruders
+    set_id!(output.intruder_collection.intruders[i],inputVals.intruders[i].id)
+  end
+
+  set!(cas.input,inputVals)
+  update(cas.casShared,cas.input,cas.output)
+  get!(cas.output,outputVals)
+
+  return outputVals #for convenience, since we are directly modifying outputVals input arg
 end
 
 function checked_convert{T <: Unsigned}(::Type{T},n::Integer)

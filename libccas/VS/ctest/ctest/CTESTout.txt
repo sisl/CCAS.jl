@@ -1,0 +1,304 @@
+Starting...v0003
+Written by Ritchie Lee
+ritchie.lee@sv.cmu.edu
+Written by Ritchie Lee
+ritchie.lee@sv.cmu.edu
+Version: 0.8.3 Sep 11 2014 17:57:09
+Max_intruders: 1
+No errors.
+
+i = 1
+Reset()
+t = 1
+Input JSON
+{
+	"own" : {
+		"dz" : 0,
+		"z" : 1665,
+		"psi" : 0,
+		"h" : 1665,
+		"modes" : 1
+	}
+,
+	"intruder" : [
+		{
+			"valid" : 0,
+			"id" : 100,
+			"modes" : 2,
+			"sr" : 16500,
+			"chi" : -1.2,
+			"z" : 2200,
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"equipage" : 0,
+			"quant" : 25,
+			"sensitivity_index" : 0,
+			"protection_mode" : 0
+		}
+	]
+}
+
+Output JSON
+{
+	"cc" : 0,
+	"vc" : 0,
+	"ua" : 0,
+	"da" : 0,
+	"target_rate" : 99999.5,
+	"turn_off_aurals" : 1,
+	"crossing" : 0,
+	"alarm" : 0,
+	"alert" : 0,
+	"dh_min" : -9999,
+	"dh_max" : 9999,
+	"sensitivity_index" : 2,
+	"ddh" : 0,
+	"intruder" : [
+		{
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"tds" : -4.8367e-026,
+			"code" : 0
+		}
+	]
+}
+
+
+i = 2
+Reset()
+t = 1
+Input JSON
+{
+	"own" : {
+		"dz" : 0,
+		"z" : 1665,
+		"psi" : 0,
+		"h" : 1665,
+		"modes" : 1
+	}
+,
+	"intruder" : [
+		{
+			"valid" : 0,
+			"id" : 100,
+			"modes" : 2,
+			"sr" : 16500,
+			"chi" : -1.2,
+			"z" : 2200,
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"equipage" : 0,
+			"quant" : 25,
+			"sensitivity_index" : 0,
+			"protection_mode" : 0
+		}
+	]
+}
+
+Output JSON
+{
+	"cc" : 0,
+	"vc" : 0,
+	"ua" : 0,
+	"da" : 0,
+	"target_rate" : 99999.5,
+	"turn_off_aurals" : 1,
+	"crossing" : 0,
+	"alarm" : 0,
+	"alert" : 0,
+	"dh_min" : -9999,
+	"dh_max" : 9999,
+	"sensitivity_index" : 2,
+	"ddh" : 0,
+	"intruder" : [
+		{
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"tds" : -4.8367e-026,
+			"code" : 0
+		}
+	]
+}
+
+
+i = 3
+Reset()
+t = 1
+Input JSON
+{
+	"own" : {
+		"dz" : 0,
+		"z" : 1665,
+		"psi" : 0,
+		"h" : 1665,
+		"modes" : 1
+	}
+,
+	"intruder" : [
+		{
+			"valid" : 0,
+			"id" : 100,
+			"modes" : 2,
+			"sr" : 16500,
+			"chi" : -1.2,
+			"z" : 2200,
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"equipage" : 0,
+			"quant" : 25,
+			"sensitivity_index" : 0,
+			"protection_mode" : 0
+		}
+	]
+}
+
+Output JSON
+{
+	"cc" : 0,
+	"vc" : 0,
+	"ua" : 0,
+	"da" : 0,
+	"target_rate" : 99999.5,
+	"turn_off_aurals" : 1,
+	"crossing" : 0,
+	"alarm" : 0,
+	"alert" : 0,
+	"dh_min" : -9999,
+	"dh_max" : 9999,
+	"sensitivity_index" : 2,
+	"ddh" : 0,
+	"intruder" : [
+		{
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"tds" : -4.8367e-026,
+			"code" : 0
+		}
+	]
+}
+
+
+i = 4
+Reset()
+t = 1
+Input JSON
+{
+	"own" : {
+		"dz" : 0,
+		"z" : 1665,
+		"psi" : 0,
+		"h" : 1665,
+		"modes" : 1
+	}
+,
+	"intruder" : [
+		{
+			"valid" : 0,
+			"id" : 100,
+			"modes" : 2,
+			"sr" : 16500,
+			"chi" : -1.2,
+			"z" : 2200,
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"equipage" : 0,
+			"quant" : 25,
+			"sensitivity_index" : 0,
+			"protection_mode" : 0
+		}
+	]
+}
+
+Output JSON
+{
+	"cc" : 0,
+	"vc" : 0,
+	"ua" : 0,
+	"da" : 0,
+	"target_rate" : 99999.5,
+	"turn_off_aurals" : 1,
+	"crossing" : 0,
+	"alarm" : 0,
+	"alert" : 0,
+	"dh_min" : -9999,
+	"dh_max" : 9999,
+	"sensitivity_index" : 2,
+	"ddh" : 0,
+	"intruder" : [
+		{
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"tds" : -4.8367e-026,
+			"code" : 0
+		}
+	]
+}
+
+
+i = 5
+Reset()
+t = 1
+Input JSON
+{
+	"own" : {
+		"dz" : 0,
+		"z" : 1665,
+		"psi" : 0,
+		"h" : 1665,
+		"modes" : 1
+	}
+,
+	"intruder" : [
+		{
+			"valid" : 0,
+			"id" : 100,
+			"modes" : 2,
+			"sr" : 16500,
+			"chi" : -1.2,
+			"z" : 2200,
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"equipage" : 0,
+			"quant" : 25,
+			"sensitivity_index" : 0,
+			"protection_mode" : 0
+		}
+	]
+}
+
+Output JSON
+{
+	"cc" : 0,
+	"vc" : 0,
+	"ua" : 0,
+	"da" : 0,
+	"target_rate" : 99999.5,
+	"turn_off_aurals" : 1,
+	"crossing" : 0,
+	"alarm" : 0,
+	"alert" : 0,
+	"dh_min" : -9999,
+	"dh_max" : 9999,
+	"sensitivity_index" : 2,
+	"ddh" : 0,
+	"intruder" : [
+		{
+			"cvc" : 0,
+			"vrc" : 0,
+			"vsb" : 0,
+			"tds" : -4.8367e-026,
+			"code" : 0
+		}
+	]
+}
+
+

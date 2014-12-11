@@ -1,0 +1,33 @@
+﻿Build started 12/4/2014 3:46:21 PM.
+     1>Project "C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\cuvtest\cuvtest.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\Debug\cuvtest.exe" /INCREMENTAL /NOLOGO libuv.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:MSVCRTD /NODEFAULTLIB:LIBCMTD /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\Debug\cuvtest.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\Debug\cuvtest.lib" /MACHINE:X86 Debug\cuvtest.obj
+     1>cuvtest.obj : error LNK2001: unresolved external symbol __purecall
+     1>cuvtest.obj : error LNK2019: unresolved external symbol "void * __cdecl operator new(unsigned int)" (??2@YAPAXI@Z) referenced in function "char * __cdecl std::_Allocate<char>(unsigned int,char *)" (??$_Allocate@D@std@@YAPADIPAD@Z)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol "void __cdecl operator delete(void *)" (??3@YAXPAX@Z) referenced in function "public: virtual void * __thiscall std::_Generic_error_category::`scalar deleting destructor'(unsigned int)" (??_G_Generic_error_category@std@@UAEPAXI@Z)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol _atexit referenced in function "void __cdecl `dynamic initializer for 'public: static class std::_Generic_error_category std::_Error_objects<int>::_Generic_object''(void)" (??__E?_Generic_object@?$_Error_objects@H@std@@2V_Generic_error_category@2@A@@YAXXZ)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __imp___hypot referenced in function _hypot
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __imp__getchar referenced in function _main
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __imp__malloc referenced in function _main
+     1>cuvtest.obj : error LNK2019: unresolved external symbol _memcpy referenced in function "public: static char * __cdecl std::char_traits<char>::copy(char *,char const *,unsigned int)" (?copy@?$char_traits@D@std@@SAPADPADPBDI@Z)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol _strlen referenced in function "public: static unsigned int __cdecl std::char_traits<char>::length(char const *)" (?length@?$char_traits@D@std@@SAIPBD@Z)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __imp__memmove referenced in function "public: static char * __cdecl std::char_traits<char>::move(char *,char const *,unsigned int)" (?move@?$char_traits@D@std@@SAPADPADPBDI@Z)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol _uv_dlopen referenced in function _main
+     1>cuvtest.obj : error LNK2019: unresolved external symbol _uv_dlsym referenced in function _main
+     1>cuvtest.obj : error LNK2019: unresolved external symbol @_RTC_CheckStackVars@8 referenced in function __catch$??$?6U?$char_traits@D@std@@@std@@YAAAV?$basic_ostream@DU?$char_traits@D@std@@@0@AAV10@PBD@Z$0
+     1>cuvtest.obj : error LNK2019: unresolved external symbol @__security_check_cookie@4 referenced in function __catch$??$?6U?$char_traits@D@std@@@std@@YAAAV?$basic_ostream@DU?$char_traits@D@std@@@0@AAV10@PBD@Z$0
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __CxxThrowException@8 referenced in function __catch$?_Copy@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEXII@Z$1
+     1>cuvtest.obj : error LNK2019: unresolved external symbol __RTC_CheckEsp referenced in function "class std::basic_ostream<char,struct std::char_traits<char> > & __cdecl std::operator<<<struct std::char_traits<char> >(class std::basic_ostream<char,struct std::char_traits<char> > &,char const *)" (??$?6U?$char_traits@D@std@@@std@@YAAAV?$basic_ostream@DU?$char_traits@D@std@@@0@AAV10@PBD@Z)
+     1>cuvtest.obj : error LNK2001: unresolved external symbol __RTC_InitBase
+     1>cuvtest.obj : error LNK2001: unresolved external symbol __RTC_Shutdown
+     1>cuvtest.obj : error LNK2019: unresolved external symbol ___CxxFrameHandler3 referenced in function __unwindfunclet$??$?6U?$char_traits@D@std@@@std@@YAAAV?$basic_ostream@DU?$char_traits@D@std@@@0@AAV10@PBD@Z$2
+     1>cuvtest.obj : error LNK2001: unresolved external symbol "const type_info::`vftable'" (??_7type_info@@6B@)
+     1>cuvtest.obj : error LNK2019: unresolved external symbol ___security_cookie referenced in function "class std::basic_ostream<char,struct std::char_traits<char> > & __cdecl std::operator<<<struct std::char_traits<char> >(class std::basic_ostream<char,struct std::char_traits<char> > &,char const *)" (??$?6U?$char_traits@D@std@@@std@@YAAAV?$basic_ostream@DU?$char_traits@D@std@@@0@AAV10@PBD@Z)
+     1>cuvtest.obj : error LNK2001: unresolved external symbol __fltused
+     1>LINK : error LNK2001: unresolved external symbol _WinMainCRTStartup
+     1>C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\Debug\cuvtest.exe : fatal error LNK1120: 23 unresolved externals
+     1>Done Building Project "C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\cuvtest\cuvtest.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.17

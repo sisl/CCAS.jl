@@ -15,13 +15,9 @@ function runtest()
   println("max_intruders: ", max_intruders(cas))
 
   nintruders = max_intruders(cas)
-  input = Input(nintruders)
   inputVals = InputVals(nintruders)
-  output = Output(nintruders)
   outputVals = OutputVals(nintruders)
   println("output handle = ", output.handle)
-
-  set_id!(output.intruder_collection.intruders[1],100)
 
   for i=1:5
     println("\ni = ", i)
@@ -31,24 +27,25 @@ function runtest()
       println("\nt = ", t)
 
       inputVals.ownInput.dz = 0.0
-      inputVals.ownInput.z = 36000
+      inputVals.ownInput.z = 1665
       inputVals.ownInput.psi = 0.0
-      inputVals.ownInput.h = 36000
-      inputVals.ownInput.modes = 0x123
-      inputVals.intruders[1].valid = false
+      inputVals.ownInput.h = 1665
+      inputVals.ownInput.modes = 0x1
+      inputVals.intruders[1].valid = true
       inputVals.intruders[1].id = 100
-      inputVals.intruders[1].modes = 0x456
-      inputVals.intruders[1].sr = 10000
-      inputVals.intruders[1].z = 10000
-      inputVals.intruders[1].chi = 0.0
-      inputVals.intruders[1].quant = 25
+      inputVals.intruders[1].modes = 0x2
+      inputVals.intruders[1].chi = -1.2
+      inputVals.intruders[1].sr = 16500
+      inputVals.intruders[1].z = 2200
+      inputVals.intruders[1].cvc = 0x0
+      inputVals.intruders[1].vrc = 0x0
+      inputVals.intruders[1].vsb = 0x0
       inputVals.intruders[1].equipage = EQUIPAGE.EQUIPAGE_ATCRBS
+      inputVals.intruders[1].quant = 25
+      inputVals.intruders[1].sensitivity_index = 0x0
+      inputVals.intruders[1].protection_mode = 0x0
 
-      set!(input,inputVals)
-
-      update(cas,input,output)
-
-      get!(output,outputVals)
+      update!(cas,inputVals,outputVals)
 
       #xdump(inputVals.ownInput)
       #xdump(inputVals.intruders[1])
@@ -65,4 +62,9 @@ function runtest()
 
   println()
   println("Done!")
+end
+
+#Call the C version of the test directly
+function runctest()
+   ccall((:debug_main,CCAS.LIBCCAS), Void, (),)
 end

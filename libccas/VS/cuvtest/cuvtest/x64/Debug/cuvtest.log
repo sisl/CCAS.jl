@@ -1,0 +1,10 @@
+﻿Build started 12/4/2014 10:05:44 PM.
+     1>Project "C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\cuvtest\cuvtest.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\x64\Debug\cuvtest.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\x64\Debug\cuvtest.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\x64\Debug\cuvtest.lib" /MACHINE:X64 x64\Debug\cuvtest.obj
+         cuvtest.vcxproj -> C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\x64\Debug\cuvtest.exe
+     1>Done Building Project "C:\Users\rcnlee\.julia\v0.3\CCAS\libccas\VS\cuvtest\cuvtest\cuvtest.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.33

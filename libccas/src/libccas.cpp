@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include "libccas.h"
 #include "../../libcas/interface/libcasshared.h"
 #include "libccas_Export.h"
@@ -11,6 +13,8 @@ using namespace libcas;
 extern "C"
 {
 #endif
+
+ofstream myfile;
 
 libccas_EXPORT CConstants newCConstants(uint8 quant, const char* config_filename, uint32 max_intruders)
 {
@@ -48,7 +52,7 @@ libccas_EXPORT void delCCASShared(CCASShared cCASShared)
 libccas_EXPORT void reset(CCASShared cCASShared)
 {
 	CASShared* pCASShared = reinterpret_cast<CASShared*>(cCASShared);
-
+	myfile << "Reset()" << endl;
 	pCASShared->reset();
 }
 
@@ -76,7 +80,7 @@ libccas_EXPORT COwnInput getRefCOwnInput(CInput cInput)
 {
 	Input* pInput = reinterpret_cast<Input*>(cInput);
 
-	return reinterpret_cast<COwnInput*>(&pInput->own);
+	return reinterpret_cast<COwnInput*>(&(pInput->own));
 }
 
 libccas_EXPORT void setCOwnInput(COwnInput cOwnInput, real dz, real z, real psi, real h, uint32 modes)
@@ -436,16 +440,11 @@ libccas_EXPORT real getCOutput_ddh(COutput cOutput)
 	return pOutput->ddh;
 }
 
-#define CCASDEBUG
 libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput)
 {
 	CASShared* pCASShared = reinterpret_cast<CASShared*>(cCASShared);
 	Input* pInput = reinterpret_cast<Input*>(cInput);
 	Output* pOutput = reinterpret_cast<Output*>(cOutput);
-
-#ifdef CCASDEBUG
-	print_CInput(cInput);
-#endif
 
 	try
 	{
@@ -453,82 +452,78 @@ libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput
 	}
 	catch (const char* e)
 	{
-		cout << "Exception in update: " << e << endl;
+		myfile << "Exception in update: " << e << endl;
 	}
 	catch (...)
 	{
-		cout << "Exception in update: general" << endl;
+		myfile << "Exception in update: general" << endl;
 	}
-
-#ifdef CCASDEBUG
-	print_COutput(cOutput);
-#endif
 }
 
 libccas_EXPORT void print_CInput(CInput cInput)
 {
 	Input* pInput = reinterpret_cast<Input*>(cInput);
-	cout << "Input" << endl;
+	myfile << "Input" << endl;
 
 	//Print Ownship
-	cout << "Ownship:" << endl;
-	cout << "dz = " << pInput->own.dz << endl;
-	cout << "z = " << pInput->own.z << endl;
-	cout << "psi = " << pInput->own.psi << endl;
-	cout << "h = " << pInput->own.h << endl;
-	cout << "modes = " << pInput->own.modes << endl;
+	myfile << "Ownship:" << endl;
+	myfile << "dz = " << pInput->own.dz << endl;
+	myfile << "z = " << pInput->own.z << endl;
+	myfile << "psi = " << pInput->own.psi << endl;
+	myfile << "h = " << pInput->own.h << endl;
+	myfile << "modes = " << pInput->own.modes << endl;
 
 	//Print intruders
 	for (int i = 0; i < pInput->intruder.size(); i++)
 	{
-		cout << "Intruder " << i << ":" << endl;
-		cout << "valid = " << pInput->intruder[i].valid << endl;
-		cout << "id = " << (int)pInput->intruder[i].id << endl;
-		cout << "modes = " << (int)pInput->intruder[i].modes << endl;
-		cout << "sr = " << pInput->intruder[i].sr << endl;
-		cout << "chi = " << pInput->intruder[i].chi << endl;
-		cout << "z = " << pInput->intruder[i].z << endl;
-		cout << "cvc = " << (int)pInput->intruder[i].cvc << endl;
-		cout << "vrc = " << (int)pInput->intruder[i].vrc << endl;
-		cout << "vsb = " << (int)pInput->intruder[i].vsb << endl;
-		cout << "equipage = " << (int)pInput->intruder[i].equipage << endl;
-		cout << "quant = " << (int)pInput->intruder[i].quant << endl;
-		cout << "sensitivity_index = " << (int)pInput->intruder[i].sensitivity_index << endl;
-		cout << "protection_mode = " << (int)pInput->intruder[i].protection_mode << endl;
+		myfile << "Intruder " << i << ":" << endl;
+		myfile << "valid = " << pInput->intruder[i].valid << endl;
+		myfile << "id = " << (int)pInput->intruder[i].id << endl;
+		myfile << "modes = " << (int)pInput->intruder[i].modes << endl;
+		myfile << "sr = " << pInput->intruder[i].sr << endl;
+		myfile << "chi = " << pInput->intruder[i].chi << endl;
+		myfile << "z = " << pInput->intruder[i].z << endl;
+		myfile << "cvc = " << (int)pInput->intruder[i].cvc << endl;
+		myfile << "vrc = " << (int)pInput->intruder[i].vrc << endl;
+		myfile << "vsb = " << (int)pInput->intruder[i].vsb << endl;
+		myfile << "equipage = " << (int)pInput->intruder[i].equipage << endl;
+		myfile << "quant = " << (int)pInput->intruder[i].quant << endl;
+		myfile << "sensitivity_index = " << (int)pInput->intruder[i].sensitivity_index << endl;
+		myfile << "protection_mode = " << (int)pInput->intruder[i].protection_mode << endl;
 	}
 }
 
 libccas_EXPORT void print_COutput(COutput cOutput)
 {
 	Output* pOutput = reinterpret_cast<Output*>(cOutput);
-	cout << "Output" << endl;
+	myfile << "Output" << endl;
 
 	//Print Ownship
-	cout << "Output:" << endl;
-	cout << "cc = " << (int)pOutput->cc << endl;
-	cout << "vc = " << (int)pOutput->vc << endl;
-	cout << "ua = " << (int)pOutput->ua << endl;
-	cout << "da = " << (int)pOutput->da << endl;
-	cout << "target_rate = " << pOutput->target_rate << endl;
-	cout << "turn_off_aurals = " << pOutput->turn_off_aurals << endl;
-	cout << "crossing = " << pOutput->crossing << endl;
-	cout << "alarm = " << pOutput->alarm << endl;
-	cout << "alert = " << pOutput->alert << endl;
-	cout << "dh_min = " << pOutput->dh_min << endl;
-	cout << "dh_max = " << pOutput->dh_max << endl;
-	cout << "sensitivity_index = " << (int)pOutput->sensitivity_index << endl;
-	cout << "ddh = " << pOutput->ddh << endl;
+	myfile << "Output:" << endl;
+	myfile << "cc = " << (int)pOutput->cc << endl;
+	myfile << "vc = " << (int)pOutput->vc << endl;
+	myfile << "ua = " << (int)pOutput->ua << endl;
+	myfile << "da = " << (int)pOutput->da << endl;
+	myfile << "target_rate = " << pOutput->target_rate << endl;
+	myfile << "turn_off_aurals = " << pOutput->turn_off_aurals << endl;
+	myfile << "crossing = " << pOutput->crossing << endl;
+	myfile << "alarm = " << pOutput->alarm << endl;
+	myfile << "alert = " << pOutput->alert << endl;
+	myfile << "dh_min = " << pOutput->dh_min << endl;
+	myfile << "dh_max = " << pOutput->dh_max << endl;
+	myfile << "sensitivity_index = " << (int)pOutput->sensitivity_index << endl;
+	myfile << "ddh = " << pOutput->ddh << endl;
 
 	//Print intruders
 	for (int i = 0; i < pOutput->intruder.size(); i++)
 	{
-		cout << "Intruder " << i << ":" << endl;
-		cout << "id = " << (int)pOutput->intruder[i].id << endl;
-		cout << "cvc = " << (int)pOutput->intruder[i].cvc << endl;
-		cout << "vrc = " << (int)pOutput->intruder[i].vrc << endl;
-		cout << "vsb = " << (int)pOutput->intruder[i].vsb << endl;
-		cout << "tds = " << pOutput->intruder[i].tds << endl;
-		cout << "code = " << (int)pOutput->intruder[i].code << endl;
+		myfile << "Intruder " << i << ":" << endl;
+		myfile << "id = " << (int)pOutput->intruder[i].id << endl;
+		myfile << "cvc = " << (int)pOutput->intruder[i].cvc << endl;
+		myfile << "vrc = " << (int)pOutput->intruder[i].vrc << endl;
+		myfile << "vsb = " << (int)pOutput->intruder[i].vsb << endl;
+		myfile << "tds = " << pOutput->intruder[i].tds << endl;
+		myfile << "code = " << (int)pOutput->intruder[i].code << endl;
 	}
 }
 
@@ -557,7 +552,7 @@ libccas_EXPORT uint32 max_intruders(CCASShared cCASShared)
 libccas_EXPORT const char* author()
 {
 	const char* msg = "Written by Ritchie Lee\nritchie.lee@sv.cmu.edu";
-	cout << msg << endl;
+	myfile << msg << endl;
 
 	return msg;
 }
@@ -584,27 +579,31 @@ libccas_EXPORT int enum_EQUIPAGE_TCAS()
 
 int main(int argc, const char* argv[])
 {
-	cout << "Starting..." << endl;
-	cout << argv[0] << endl;
+	const char* ver = "v0003";
+	myfile.open("outputfile.txt");
 
-	cout << author() << endl;
+	cout << "Starting..." << ver << endl;
+	myfile << "Starting..." << ver << endl;
 
-	const char* config_filename = "../../../../libcas/parameters/0.8.3.standard.r13.config.txt";
+	myfile << author() << endl;
+
+	// Assume working directory is CCAS/test
+	const char* config_filename = "../libcas/parameters/0.8.3.standard.r13.config.txt";
 
 	CConstants cConstants = newCConstants(25, config_filename, 1);
 
-	const char* library_path = "../../../../libcas/lib/libcas.dll";
+	const char* library_path = "../libcas/lib/libcas.dll";
 
 	CCASShared cCASShared = newCCASShared(cConstants, library_path);
 
-	cout << "Version: " << version(cCASShared) << endl;
-	cout << "Max_intruders: " << max_intruders(cCASShared) << endl;
+	myfile << "Version: " << version(cCASShared) << endl;
+	myfile << "Max_intruders: " << max_intruders(cCASShared) << endl;
 
 	const char* errorMsg = error(cCASShared);
 	if (errorMsg == NULL)
-		cout << "No errors." << endl;
+		myfile << "No errors." << endl;
 	else
-		cout << "Error: " << errorMsg << endl;	
+		myfile << "Error: " << errorMsg << endl;	
 
 	CInput cInput = newCInput();
 
@@ -623,33 +622,30 @@ int main(int argc, const char* argv[])
 
 	for (int i = 1; i <= 5; i++)
 	{
-		cout << endl;
-		cout << "i = " << i << endl;
+		myfile << endl;
+		myfile << "i = " << i << endl;
 
 		reset(cCASShared);
 
 		for (int t = 1; t <= 1; t++)
 		{
-			cout << "t = " << t << endl;
+			myfile << "t = " << t << endl;
+			
 			//set input
-			setCOwnInput(cOwnInput, 0.0, 36000.0, 0.0, 36000.0, 0x123);
-			OwnInput* pOwnInput = reinterpret_cast<OwnInput*>(cOwnInput);
-			Input* pInput = reinterpret_cast<Input*>(cInput);
+			setCOwnInput(cOwnInput, 0.0, 1665, 0.0, 1665.0, 0x1);
 
 			setCIntruderInput(cIntruderInput, false, 100,
-				0x456, 10000.0, 0.0, 10000, 0x0, 0x0, 0x0, enum_EQUIPAGE_ATCRBS(),
+				0x2, 16500.0, -1.2, 2200, 0x0, 0x0, 0x0, enum_EQUIPAGE_ATCRBS(),
 				25, 0x0, 0x0);
+
+			// Print input
+			print_CInput(cInput);
 
 			// update
 			update(cCASShared, cInput, cOutput);
 
-			//get output
-			//cout << "[" << (int)getCOutput_cc(cOutput) << "," << (int)getCOutput_vc(cOutput) << ","
-			//	<< (int)getCOutput_ua(cOutput) << "," << (int)getCOutput_da(cOutput) << "]" << endl;
-			//cout << "target_rate=" << getCOutput_target_rate(cOutput) << endl;
-			//cout << "dh_min=" << getCOutput_dh_min(cOutput) 
-			//	<< ", dh_max=" << getCOutput_dh_max(cOutput) << endl;
-			//cout << "ddh=" << getCOutput_ddh(cOutput) << endl;
+			// Print output
+			print_COutput(cOutput);
 		}
 	}
 
@@ -658,13 +654,41 @@ int main(int argc, const char* argv[])
 	delCInput(cInput);
 	delCOutput(cOutput);
 
-	cout << endl;
+	myfile << endl;
 	cout << "Done!" << endl;
 	cout << "Press any key to continue..." << endl;
+	myfile.close();
 	getchar();
 	return 0;
+}
+
+libccas_EXPORT void debug_main()
+{
+	const char** argv = NULL;
+	main(0, argv);
 }
 
 #ifdef  __cplusplus
 }
 #endif
+
+/**
+Unused code:
+#include "../../libcas/interface/libcasserialization.h"
+
+JSON Input/Output:
+const int inbufsize = 10000;
+char inbuffer[inbufsize];
+size_t numbytes = json_serialize(*pInput, inbuffer, inbufsize);
+myfile << "Input JSON" << endl;
+myfile << inbuffer << endl;
+
+Output* pOutput = reinterpret_cast<Output*>(cOutput);
+const int outbufsize = 10000;
+char outbuffer[outbufsize];
+numbytes = json_serialize(*pOutput, outbuffer, outbufsize);
+myfile << "Output JSON" << endl;
+myfile << outbuffer << endl;
+
+
+*/
