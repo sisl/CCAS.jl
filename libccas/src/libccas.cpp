@@ -582,7 +582,7 @@ int main(int argc, const char* argv[])
 	const char* ver = "v0003";
 	myfile.open("outputfile.txt");
 
-	cout << "Starting..." << ver << endl;
+	cout << "Starting debug_main..." << ver << endl;
 	myfile << "Starting..." << ver << endl;
 
 	myfile << author() << endl;
@@ -627,14 +627,14 @@ int main(int argc, const char* argv[])
 
 		reset(cCASShared);
 
-		for (int t = 1; t <= 1; t++)
+		for (int t = 1; t <= 5; t++)
 		{
 			myfile << "t = " << t << endl;
 			
 			//set input
 			setCOwnInput(cOwnInput, 0.0, 1665, 0.0, 1665.0, 0x1);
 
-			setCIntruderInput(cIntruderInput, false, 100,
+			setCIntruderInput(cIntruderInput, true, 100,
 				0x2, 16500.0, -1.2, 2200, 0x0, 0x0, 0x0, enum_EQUIPAGE_ATCRBS(),
 				25, 0x0, 0x0);
 

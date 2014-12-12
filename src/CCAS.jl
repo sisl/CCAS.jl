@@ -1,7 +1,7 @@
 module CCAS
 
-PACKAGE_PATH = Pkg.dir("CCAS")
-const LIBCCAS = joinpath(PACKAGE_PATH,"libccas/lib/libccas")
+const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas")
+const LIBCAS = Pkg.dir("CCAS/libcas/lib/libcas")
 
 export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders,
          OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
@@ -406,8 +406,8 @@ type CASShared
                    consts.handle, library_path)
     obj = new(handle)
     obj.max_intruders = max_intruders(obj)
-    obj.input = Input(max_intruders)
-    obj.output = Output(max_intruders)
+    obj.input = Input(obj.max_intruders)
+    obj.output = Output(obj.max_intruders)
 
     finalizer(obj,obj->ccall((:delCCASShared,LIBCCAS),Void, (Ptr{Void},),obj.handle))
 
