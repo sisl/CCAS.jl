@@ -1,5 +1,3 @@
-Under construction...
-
 # CCAS
 
 CCAS is a Julia wrapper for the MIT-LL libcas (ACASX) C library and interface.  (libcas not included)
@@ -22,6 +20,7 @@ Dependencies:
 5. Check under CCAS/libccas/lib for available precompiled libraries.  Choose the desired version and rename it to libccas.dll (libccas.lib is not required).  If the desired libraries are not available, then you will need to compile it from source.
 
 To build libccas from source (Windows):
+
 1. Go to CCAS/libccas/src/Build
 2. Choose Visual Studio target and run CMake on .. (parent directory).
 Note: CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining the BOOST_ROOT environment variable.
