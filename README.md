@@ -59,15 +59,18 @@ test/                                    Julia module tests
 using CCAS
 
 #define constants
-PACKAGE_PATH = Pkg.dir("CCAS")
-const LIBCAS_CONFIG = joinpath(PACKAGE_PATH,"libcas/parameters/0.8.3.standard.r13.config.txt")
-const LIBCAS_LIB = joinpath(PACKAGE_PATH,"libcas/lib/libcas.dll")
+const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.3.standard.r13.config.txt")
+const LIBCAS_LIB = Pkg.dir("CCAS/libcas/lib/libcas.dll")
+
 consts = Constants(25, LIBCAS_CONFIG, 1)
 cas = CASShared(consts,LIBCAS_LIB) #main cas object
 nintruders = max_intruders(cas)
 inputVals = InputVals(nintruders) #create input structure
 outputVals = OutputVals(nintruders) #create output structure
+
 reset(cas) #reset the cas
+
+#loop start
 
 #populate inputVals here...
 #...
@@ -80,6 +83,8 @@ update!(cas,inputVals,outputVals)
 #read and handle error messages
 errorMsg = error_msg(cas)
 println( errorMsg == nothing ? "No Errors" : errorMsg )
+
+#loop end
 
 ```
 
