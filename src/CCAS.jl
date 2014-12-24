@@ -435,11 +435,11 @@ function update!(cas::CASShared,inputVals::InputVals,outputVals::OutputVals)
 
   #id in output isn't populated by libcas for some reason, so we'll do it on our end
   for i = 1:cas.max_intruders
-    set_id!(output.intruder_collection.intruders[i],inputVals.intruders[i].id)
+    set_id!(cas.output.intruder_collection.intruders[i],inputVals.intruders[i].id)
   end
 
   set!(cas.input,inputVals)
-  update(cas.casShared,cas.input,cas.output)
+  update(cas,cas.input,cas.output)
   get!(cas.output,outputVals)
 
   return outputVals #for convenience, since we are directly modifying outputVals input arg

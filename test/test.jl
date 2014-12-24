@@ -1,8 +1,7 @@
 using CCAS
 
-PACKAGE_PATH = Pkg.dir("CCAS")
-const LIBCAS_CONFIG = joinpath(PACKAGE_PATH,"libcas/parameters/0.8.3.standard.r13.config.txt")
-const LIBCAS_LIB = joinpath(PACKAGE_PATH,"libcas/lib/libcas.dll")
+const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.3.standard.r13.config.txt")
+const LIBCAS_LIB = Pkg.dir("CCAS/libcas/lib/libcas.dll")
 
 function runtest()
   println(author())
