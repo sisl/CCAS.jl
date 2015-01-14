@@ -9,7 +9,7 @@ Ritchie Lee, ritchie.lee@sv.cmu.edu
 ## Installation
 
 Dependencies: 
-* Boost C++ Libraries  >1.57.0
+* Boost C++ Libraries  >1.46.0
 * Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders)
 * LibCAS distribution
 
@@ -26,6 +26,13 @@ To build libccas from source (Windows):
 Note: CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining the BOOST_ROOT environment variable.
 3. Build the generated solution file, then build the INSTALL project.  INSTALL will automatically put the files in the correct folders.
 
+To build libccas from source (Linux):
+
+1. Go to CCAS/libccas/src/Build
+2. cmake ..
+Note: If cmake isn't able to automatically detect your boost installation, try setting the BOOST_ROOT environment variable.
+3. make
+4. make install
 
 ## Directory Structure
 ```
