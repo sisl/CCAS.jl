@@ -263,7 +263,7 @@ function OutputVals(nintruders::Int)
     intruders = IntruderOutputVals[IntruderOutputVals() for i=1:nintruders]
 
     return OutputVals(uint8(0),uint8(0),uint8(0),uint8(0),0.,false,false,false,false,
-               0.,0.,uint8(0),0.,intruders)
+               -9999.0,9999.0,uint8(0),0.,intruders)
   end
 
 type IntruderOutput
