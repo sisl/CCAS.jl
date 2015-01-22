@@ -16,7 +16,7 @@ function runtest()
   nintruders = max_intruders(cas)
   inputVals = InputVals(nintruders)
   outputVals = OutputVals(nintruders)
-  println("output handle = ", output.handle)
+  println("output handle = ", cas.output.handle)
 
   for i=1:5
     println("\ni = ", i)
