@@ -1,13 +1,12 @@
 using CCAS
 
 const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.3.standard.r13.config.txt")
-const LIBCAS_LIB = Pkg.dir("CCAS/libcas/lib/libcas")
 
 function runtest()
   println(author())
 
   consts = Constants(25, LIBCAS_CONFIG, 1)
-  cas = CASShared(consts,LIBCAS_LIB)
+  cas = CASShared(consts)
   println("cas handle = ", cas.handle)
 
   println(version(cas))
