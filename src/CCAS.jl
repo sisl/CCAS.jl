@@ -3,7 +3,7 @@ module CCAS
 const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas")
 const LIBCAS = @windows ? Pkg.dir("CCAS/libcas/lib/libcas.dll") : @linux ? Pkg.dir("CCAS/libcas/lib/libcas.so") : error("Unrecognized platform")
 
-export   Equipage, EQUIPAGE, Constants, CASShared, reset, version, error_msg, max_intruders,
+export   Equipage, EQUIPAGE, Constants, CASShared, reset, reset!, version, error_msg, max_intruders,
          OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
          OutputVals, update!, author
 
@@ -242,6 +242,17 @@ type IntruderOutputVals
   end
 end
 
+function reset!(iout::IntruderOutputVals)
+  iout.id = uint32(0)
+  iout.cvc = uint8(0)
+  iout.vrc = uint8(0)
+  iout.vsb = uint8(0)
+  iout.tds = 0.0
+  iout.code = uint8(0)
+
+  return
+end
+
 type OutputVals
   cc::Uint8
   vc::Uint8
@@ -260,11 +271,33 @@ type OutputVals
 end
 
 function OutputVals(nintruders::Int)
-    intruders = IntruderOutputVals[IntruderOutputVals() for i=1:nintruders]
+  intruders = IntruderOutputVals[IntruderOutputVals() for i=1:nintruders]
 
-    return OutputVals(uint8(0),uint8(0),uint8(0),uint8(0),0.,false,false,false,false,
-               -9999.0,9999.0,uint8(0),0.,intruders)
+  return OutputVals(uint8(0),uint8(0),uint8(0),uint8(0),0.,false,false,false,false,
+                    -9999.0,9999.0,uint8(0),0.,intruders)
+end
+
+function reset!(out::OutputVals)
+  out.cc = uint8(0)
+  out.vc = uint8(0)
+  out.ua = uint8(0)
+  out.da = uint8(0)
+  out.target_rate = 0.0
+  out.turn_off_aurals = false
+  out.crossing = false
+  out.alarm = false
+  out.alert = false
+  out.dh_min = -9999.0
+  out.dh_max = 9999.0
+  out.sensitivity_index = uint8(0)
+  out.ddh = 0.0
+
+  for i=1:endof(out.intruders)
+    reset!(out.intruders[i])
   end
+
+  return
+end
 
 type IntruderOutput
   handle::Ptr{Void}
