@@ -1,6 +1,6 @@
 using CCAS
 
-const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.3.standard.r13.config.txt")
+const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.5.standard.r13.xa.config.txt")
 
 function runtest()
   println(author())
@@ -65,4 +65,10 @@ end
 #Call the C version of the test directly
 function runctest()
    ccall((:debug_main,CCAS.LIBCCAS), Void, (),)
+end
+
+function versioninfo()
+  consts = Constants(25, LIBCAS_CONFIG, 1)
+  cas = CASShared(consts)
+  println(version(cas))
 end
