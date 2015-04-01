@@ -38,7 +38,24 @@ libccas_EXPORT CCASShared newCCASShared(CConstants cConstants, const char* libra
 {
 	Constants* pConstants = reinterpret_cast<Constants*>(cConstants);
 
-	return reinterpret_cast<CCASShared>(new CASShared(*pConstants, string(library_path)));
+	CASShared* cas = NULL;
+
+	try
+	{
+		cas = new CASShared(*pConstants, string(library_path));
+	}
+	catch (const char* e)
+	{
+		std::cout << "Exception in CASShared: " << e << endl;
+		myfile << "Exception in CASShared: " << e << endl;
+	}
+	catch (...)
+	{
+		std::cout << "Exception in CASShared: general" << endl;
+		myfile << "Exception in CASShared: general" << endl;
+	}
+
+	return reinterpret_cast<CCASShared>(cas);
 }
 
 libccas_EXPORT void delCCASShared(CCASShared cCASShared)
@@ -452,10 +469,12 @@ libccas_EXPORT void update(CCASShared cCASShared, CInput cInput, COutput cOutput
 	}
 	catch (const char* e)
 	{
+		std::cout << "Exception in update: " << e << endl;
 		myfile << "Exception in update: " << e << endl;
 	}
 	catch (...)
 	{
+		std::cout << "Exception in update: general" << endl;
 		myfile << "Exception in update: general" << endl;
 	}
 }
@@ -588,11 +607,12 @@ int main(int argc, const char* argv[])
 	myfile << author() << endl;
 
 	// Assume working directory is CCAS/test
-	const char* config_filename = "../libcas/parameters/0.8.3.standard.r13.config.txt";
+	const char* config_filename = "../libcas/parameters/0.8.5.standard.r13.xa.config.txt";
 
 	CConstants cConstants = newCConstants(25, config_filename, 1);
 
 	const char* library_path = "../libcas/lib/libcas.dll";
+	//const char* library_path = "C:/Users/rcnlee/.julia/v0.3/CCAS/libcas/lib/libcas.dll";
 
 	CCASShared cCASShared = newCCASShared(cConstants, library_path);
 
