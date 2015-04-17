@@ -44,6 +44,14 @@ type OwnInputVals
     new(dz,z,psi,h,checked_convert(Uint32,modes))
 end
 
+function reset!(ownInput::OwnInputVals)
+  ownInput.dz = 0.0
+  ownInput.z = 0.0
+  ownInput.psi = 0.0
+  ownInput.h = 0.0
+  ownInput.modes = uint32(0)
+end
+
 type IntruderInputVals
   valid::Bool
   id::Uint32
@@ -84,6 +92,22 @@ type IntruderInputVals
   end
 end
 
+function reset!(iinput::IntruderInputVals)
+  iinput.valid        = false
+  iinput.id           = uint32(0)
+  iinput.modes        = uint32(0)
+  iinput.sr           = 0.0
+  iinput.chi          = 0.0
+  iinput.z            = 0.0
+  iinput.cvc          = uint8(0)
+  iinput.vrc          = uint8(0)
+  iinput.vsb          = uint8(0)
+  iinput.equipage     = int32(0)
+  iinput.quant        = uint8(0)
+  iinput.sensitivity_index = uint8(0)
+  iinput.protection_mode   = uint8(0)
+end
+
 type InputVals
   ownInput::OwnInputVals
   intruders::Vector{IntruderInputVals}
@@ -97,6 +121,14 @@ type InputVals
   end
 
   InputVals(ownInput::OwnInputVals,intruders::Vector{IntruderInputVals}) = new(ownInput,intruders)
+end
+
+function reset!(input::InputVals)
+  reset!(input.ownInput)
+
+  for i=1:endof(input.intruders)
+    reset!(input.intruders[i])
+  end
 end
 
 type OwnInput
