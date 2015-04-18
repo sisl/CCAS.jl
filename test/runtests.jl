@@ -1,9 +1,9 @@
 using CCAS
 
-function runtest(libcas::String, config_file::String)
+function runtest(libcas::String, libcas_config::String)
   println(author())
 
-  consts = Constants(25, config_file, 1)
+  consts = Constants(25, libcas_config, 1)
   cas = CASShared(libcas, consts)
   println("cas handle = ", cas.handle)
 
