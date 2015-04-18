@@ -445,6 +445,7 @@ function size(collection::CollectionIntruderOutput)
 
   return csize
 end
+
 type Constants
   handle::Ptr{Void} #Pointer to C object
 
