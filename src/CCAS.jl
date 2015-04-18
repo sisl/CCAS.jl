@@ -1,7 +1,6 @@
 module CCAS
 
 const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas")
-const LIBCAS = @windows ? Pkg.dir("CCAS/libcas/lib/libcas.dll") : @linux ? Pkg.dir("CCAS/libcas/lib/libcas.so") : error("Unrecognized platform")
 
 export   Equipage, EQUIPAGE, Constants, CASShared, reset, reset!, version, error_msg, max_intruders,
          OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
@@ -463,14 +462,18 @@ end
 
 type CASShared
   handle::Ptr{Void} #Pointer to C object
+  libcas::String #path to library
   max_intruders::Int64
   input::Input
   output::Output
 
-  function CASShared(consts::Constants)
+  function CASShared(libcas::String, consts::Constants)
+
     handle = ccall((:newCCASShared,LIBCCAS), Ptr{Void}, (Ptr{Void},Ptr{Uint8}),
-                   consts.handle, LIBCAS)
+                   consts.handle, libcas)
+
     obj = new(handle)
+    obj.libcas = libcas
     obj.max_intruders = max_intruders(obj)
     obj.input = Input(obj.max_intruders)
     obj.output = Output(obj.max_intruders)

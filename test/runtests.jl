@@ -1,12 +1,10 @@
 using CCAS
 
-const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas/parameters/0.8.5.standard.r13.xa.config.txt")
-
-function runtest()
+function runtest(libcas::String, config_file::String)
   println(author())
 
-  consts = Constants(25, LIBCAS_CONFIG, 1)
-  cas = CASShared(consts)
+  consts = Constants(25, config_file, 1)
+  cas = CASShared(libcas, consts)
   println("cas handle = ", cas.handle)
 
   println(version(cas))
@@ -60,15 +58,4 @@ function runtest()
 
   println()
   println("Done!")
-end
-
-#Call the C version of the test directly
-function runctest()
-   ccall((:debug_main,CCAS.LIBCCAS), Void, (),)
-end
-
-function versioninfo()
-  consts = Constants(25, LIBCAS_CONFIG, 1)
-  cas = CASShared(consts)
-  println(version(cas))
 end
