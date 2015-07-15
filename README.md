@@ -9,8 +9,9 @@ Ritchie Lee, ritchie.lee@sv.cmu.edu
 ## Installation
 
 Dependencies: 
+
 * Boost C++ Libraries  >1.46.0
-* Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders)
+* Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders, see Downloads section)
 * LibCAS distribution
 
 1. Clone CCAS package into your Julia packages folder.
