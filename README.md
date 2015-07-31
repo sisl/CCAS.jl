@@ -15,36 +15,29 @@ Dependencies:
 * LibCAS distribution
 
 1. Clone CCAS package into your Julia packages folder.
-2. Put libcas interface files (.h files) under CCAS/libcas/interface
-3. Put libcas library files (dll files) under CCAS/libcas/lib
-4. Put libcas config files (.txt and .dat files) under CCAS/libcas/parameters.  The main config file contains paths to the other config files.  Make sure to edit the paths.
-5. Check under CCAS/libccas/lib for available precompiled libraries.  Choose the desired version and rename it to libccas.dll (libccas.lib is not required).  If the desired libraries are not available, then you will need to compile it from source.
+1. Check under CCAS/libccas/lib for available precompiled libraries.  Choose the desired version and rename it to libccas.dll (libccas.lib is not required).  If the desired libraries are not available, then you will need to compile them from source (see below).  Default is Windows x64.
+1. When using the CCAS wrapper, you will need to provide (1) the path to the libcas configuration file, and (2) the path to the libcas library (e.g., libcas.dll in Windows).  Make sure to edit the configuration file so that the paths to the dependent parameter files are correct.
 
 To build libccas from source (Windows):
 
 1. Go to CCAS/libccas/src/Build
-2. Choose Visual Studio target and run CMake on .. (parent directory).
+1. Choose Visual Studio target and run CMake on .. (parent directory).
 Note: CMake will try to automatically find your Boost installation.  If Boost is unable to find it, you can specify the directory manually by defining the BOOST_ROOT environment variable.
-3. Build the generated solution file, then build the INSTALL project.  INSTALL will automatically put the files in the correct folders.
+1. Build the generated solution file, then build the INSTALL project.  INSTALL will automatically put the files in the correct folders.
 
 To build libccas from source (Linux):
 
 1. Go to CCAS/libccas/src/Build
-2. cmake ..
+1. cmake ..
 Note: If cmake isn't able to automatically detect your boost installation, try setting the BOOST_ROOT environment variable.
-3. make
-4. make install
+1. make
+1. make install
 
 ## Directory Structure
 ```
 #!text
 
 CCAS/                                   Package - Top level
-
-libcas/                                   Libcas distribution top
-libcas/interface                     Place libcas header files here
-libcas/lib                               Place libcas library files here
-libcas/parameters                Place libcas config files here
 
 libccas/                                C wrapper for libcas that stands between Julia and libcas
 libccas/doc                          Libccas documentation
@@ -98,4 +91,4 @@ println( errorMsg == nothing ? "No Errors" : errorMsg )
 
 ***
 
-*Last Updated: 12/24/2014*
+*Last Updated: 07/31/2015*
