@@ -1,6 +1,12 @@
 module CCAS
 
-const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas")
+if WORD_SIZE == 32
+  const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas_x32")
+elseif WORD_SIZE == 64
+  const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas_x64")
+else
+  error("CCAS: Architecture must be 32-bit or 64-bit")
+end
 
 export   Equipage, EQUIPAGE, Constants, CASShared, reset, reset!, version, error_msg, max_intruders,
          OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
