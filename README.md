@@ -33,6 +33,12 @@ Note: If cmake isn't able to automatically detect your boost installation, try s
 1. make
 1. make install
 
+Testing your installation of CCAS:
+1. Start a Julia session at CCAS/test
+1. include("runtests.jl")
+1. runtest(libcas, libcas_config), where libcas is path to libcas dynamic library, and libcas_config is path to main parameter file.
+1. It should complete without errors and you should see author information, libcas version, some ACAS X output (including dh_min=-9999.0, dh_max=9999.0), No Errors, and Done! 
+
 ## Directory Structure
 ```
 #!text
