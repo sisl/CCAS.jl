@@ -46,7 +46,6 @@ export   Equipage, EQUIPAGE, Constants, CASShared, reset, reset!, version, error
          OwnInputVals, IntruderInputVals, InputVals, IntruderOutputVals,
          OutputVals, update!, author
 
-using Base.Test
 import Base.resize!
 import Base.size
 import Base.getindex
@@ -285,7 +284,7 @@ function size(collection::CollectionIntruderInput)
   csize = ccall((:sizeCCollectionIntrInput,LIBCCAS), Uint32, (Ptr{Void},),
                  collection.handle)
   csize = convert(Int64,csize)
-  @test csize == length(collection.intruders) #make sure we're in sync
+  @assert csize == length(collection.intruders) #make sure we're in sync
 
   return csize
 end
@@ -480,7 +479,7 @@ function size(collection::CollectionIntruderOutput)
   csize = ccall((:sizeCCollectionIntrOutput,LIBCCAS), Uint32, (Ptr{Void},),
                  collection.handle)
   csize = convert(Int64,csize)
-  @test csize == length(collection.intruders) #make sure we're in sync
+  @assert csize == length(collection.intruders) #make sure we're in sync
 
   return csize
 end
