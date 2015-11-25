@@ -9,10 +9,10 @@
 #  ifndef libccas_EXPORT
 #    ifdef libccas_EXPORTS
         /* We are building this library */
-#      define libccas_EXPORT __declspec(dllexport)
+#      define libccas_EXPORT 
 #    else
         /* We are using this library */
-#      define libccas_EXPORT __declspec(dllimport)
+#      define libccas_EXPORT 
 #    endif
 #  endif
 
@@ -22,15 +22,9 @@
 #endif
 
 #ifndef LIBCCAS_DEPRECATED
-#  define LIBCCAS_DEPRECATED __declspec(deprecated)
-#endif
-
-#ifndef LIBCCAS_DEPRECATED_EXPORT
-#  define LIBCCAS_DEPRECATED_EXPORT libccas_EXPORT LIBCCAS_DEPRECATED
-#endif
-
-#ifndef LIBCCAS_DEPRECATED_NO_EXPORT
-#  define LIBCCAS_DEPRECATED_NO_EXPORT LIBCCAS_NO_EXPORT LIBCCAS_DEPRECATED
+#  define LIBCCAS_DEPRECATED 
+#  define LIBCCAS_DEPRECATED_EXPORT libccas_EXPORT 
+#  define LIBCCAS_DEPRECATED_NO_EXPORT LIBCCAS_NO_EXPORT 
 #endif
 
 #define DEFINE_NO_DEPRECATED 0
