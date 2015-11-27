@@ -76,7 +76,7 @@ type OwnInputVals
   h::Float64
   modes::UInt32
 
-  OwnInputVals() = new(0.,0.,0.,0.,uint32(0))
+  OwnInputVals() = new(0.,0.,0.,0.,UInt32(0))
 
   OwnInputVals(dz::Float64,z::Float64,psi::Float64,h::Float64,modes::Integer) =
     new(dz,z,psi,h,checked_convert(UInt32,modes))
@@ -87,7 +87,7 @@ function reset!(ownInput::OwnInputVals)
   ownInput.z = 0.0
   ownInput.psi = 0.0
   ownInput.h = 0.0
-  ownInput.modes = uint32(0)
+  ownInput.modes = UInt32(0)
 end
 
 type IntruderInputVals
@@ -105,8 +105,8 @@ type IntruderInputVals
   sensitivity_index::UInt8
   protection_mode::UInt8
 
-  IntruderInputVals() = new(false,uint32(0),uint32(0),0.,0.,0.,uint8(0),uint8(0),uint8(0),int32(0),
-                            uint8(0),uint8(0),uint8(0))
+  IntruderInputVals() = new(false,UInt32(0),UInt32(0),0.,0.,0.,UInt8(0),UInt8(0),UInt8(0),Int32(0),
+                            UInt8(0),UInt8(0),UInt8(0))
 
   function IntruderInputVals(valid::Bool,id::UInt32,modes::UInt32,sr::Float64,chi::Float64,z::Float64,
                              cvc::UInt8,vrc::UInt8,vsb::UInt8,equipage::Int32,quant::UInt8,
@@ -132,18 +132,18 @@ end
 
 function reset!(iinput::IntruderInputVals)
   iinput.valid        = false
-  iinput.id           = uint32(0)
-  iinput.modes        = uint32(0)
+  iinput.id           = UInt32(0)
+  iinput.modes        = UInt32(0)
   iinput.sr           = 0.0
   iinput.chi          = 0.0
   iinput.z            = 0.0
-  iinput.cvc          = uint8(0)
-  iinput.vrc          = uint8(0)
-  iinput.vsb          = uint8(0)
+  iinput.cvc          = UInt8(0)
+  iinput.vrc          = UInt8(0)
+  iinput.vsb          = UInt8(0)
   iinput.equipage     = int32(0)
-  iinput.quant        = uint8(0)
-  iinput.sensitivity_index = uint8(0)
-  iinput.protection_mode   = uint8(0)
+  iinput.quant        = UInt8(0)
+  iinput.sensitivity_index = UInt8(0)
+  iinput.protection_mode   = UInt8(0)
 end
 
 type InputVals
@@ -297,7 +297,7 @@ type IntruderOutputVals
   tds::Float64
   code::UInt8
 
-  IntruderOutputVals() = IntruderOutputVals(uint32(0), uint8(0), uint8(0), uint8(0), 0., uint8(0))
+  IntruderOutputVals() = IntruderOutputVals(UInt32(0), UInt8(0), UInt8(0), UInt8(0), 0., UInt8(0))
 
   function IntruderOutputVals(id::UInt32, cvc::UInt8, vrc::UInt8, vsb::UInt8, tds::Float64, code::UInt8)
     obj         = new()
@@ -313,12 +313,12 @@ type IntruderOutputVals
 end
 
 function reset!(iout::IntruderOutputVals)
-  iout.id = uint32(0)
-  iout.cvc = uint8(0)
-  iout.vrc = uint8(0)
-  iout.vsb = uint8(0)
+  iout.id = UInt32(0)
+  iout.cvc = UInt8(0)
+  iout.vrc = UInt8(0)
+  iout.vsb = UInt8(0)
   iout.tds = 0.0
-  iout.code = uint8(0)
+  iout.code = UInt8(0)
 
   return
 end
@@ -343,15 +343,15 @@ end
 function OutputVals(nintruders::Int)
   intruders = IntruderOutputVals[IntruderOutputVals() for i = 1:nintruders]
 
-  return OutputVals(uint8(0), uint8(0), uint8(0), uint8(0), 0.0, false, false, false, false,
-                    -9999.0, 9999.0, uint8(0), 0.0, intruders)
+  return OutputVals(UInt8(0), UInt8(0), UInt8(0), UInt8(0), 0.0, false, false, false, false,
+                    -9999.0, 9999.0, UInt8(0), 0.0, intruders)
 end
 
 function reset!(out::OutputVals)
-  out.cc = uint8(0)
-  out.vc = uint8(0)
-  out.ua = uint8(0)
-  out.da = uint8(0)
+  out.cc = UInt8(0)
+  out.vc = UInt8(0)
+  out.ua = UInt8(0)
+  out.da = UInt8(0)
   out.target_rate = 0.0
   out.turn_off_aurals = false
   out.crossing = false
@@ -359,7 +359,7 @@ function reset!(out::OutputVals)
   out.alert = false
   out.dh_min = -9999.0
   out.dh_max = 9999.0
-  out.sensitivity_index = uint8(0)
+  out.sensitivity_index = UInt8(0)
   out.ddh = 0.0
 
   for i = 1:endof(out.intruders)

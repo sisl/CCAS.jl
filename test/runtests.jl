@@ -1,6 +1,6 @@
 using CCAS
 
-function runtest(libcas::String, libcas_config::String)
+function runtest(libcas::AbstractString, libcas_config::AbstractString)
   println(author())
 
   consts = Constants(25, libcas_config, 1)
