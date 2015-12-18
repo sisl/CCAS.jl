@@ -48,10 +48,26 @@ export Constants, CASShared, reset, reset!, version, error_msg,
 using CASInterface
 import Base: reset, resize!, size, getindex
 
+#= use value types in 0.4
 get_equipage(::Type{Val{EQUIPAGE_ATCRBS}}) = ccall((:enum_EQUIPAGE_ATCRBS, LIBCCAS),Int32,())
 get_equipage(::Type{Val{EQUIPAGE_MODES}}) = ccall((:enum_EQUIPAGE_MODES, LIBCCAS),Int32,())
 get_equipage(::Type{Val{EQUIPAGE_TCASTA}}) = ccall((:enum_EQUIPAGE_TCASTA, LIBCCAS),Int32,())
 get_equipage(::Type{Val{EQUIPAGE_TCAS}}) = ccall((:enum_EQUIPAGE_TCAS, LIBCCAS),Int32,())
+=#
+
+function get_equipage(equip::EQUIPAGE)
+  if equip == EQUIPAGE_ATCRBS
+    return ccall((:enum_EQUIPAGE_ATCRBS, LIBCCAS),Int32,())
+  elseif equip == EQUIPAGE_MODES
+    return ccall((:enum_EQUIPAGE_MODES, LIBCCAS),Int32,())
+  elseif equip == EQUIPAGE_TCASTA
+    return ccall((:enum_EQUIPAGE_TCASTA, LIBCCAS),Int32,())
+  elseif equip == EQUIPAGE_TCAS
+    return ccall((:enum_EQUIPAGE_TCAS, LIBCCAS),Int32,())
+  else
+    error("No such equipage: $equip")
+  end
+end
 
 type OwnInputRef
   handle::Ptr{Void}
@@ -125,7 +141,7 @@ function set!(input::OwnInputRef, inputVals::OwnInput)
 end
 
 function set!(input::IntruderInputRef, iinputVals::IntruderInput)
-  equipage = get_equipage(Val{iinputVals.equipage})
+  equipage = get_equipage(iinputVals.equipage)
   ccall((:setCIntruderInput, LIBCCAS), Void,
         (Ptr{Void}, Bool, Uint32, Uint32, Float64, Float64, Float64,
          Uint8, Uint8, Uint8, Int32, Uint8,
