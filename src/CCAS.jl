@@ -48,16 +48,10 @@ export Constants, CASShared, reset, reset!, version, error_msg,
 using CASInterface
 import Base: reset, resize!, size, getindex
 
-function get_equipage()
-  d = Dict{EQUIPAGE, Int32}()
-  d[EQUIPAGE_ATCRBS] = ccall((:enum_EQUIPAGE_ATCRBS, LIBCCAS),Int32,())
-  d[EQUIPAGE_MODES] = ccall((:enum_EQUIPAGE_MODES, LIBCCAS),Int32,())
-  d[EQUIPAGE_TCASTA] = ccall((:enum_EQUIPAGE_TCASTA, LIBCCAS),Int32,())
-  d[EQUIPAGE_TCAS] = ccall((:enum_EQUIPAGE_TCAS, LIBCCAS),Int32,())
-  return d
-end
-
-const EQUIPAGE_MAP = get_equipage()
+get_equipage(::Type{Val{EQUIPAGE_ATCRBS}}) = ccall((:enum_EQUIPAGE_ATCRBS, LIBCCAS),Int32,())
+get_equipage(::Type{Val{EQUIPAGE_MODES}}) = ccall((:enum_EQUIPAGE_MODES, LIBCCAS),Int32,())
+get_equipage(::Type{Val{EQUIPAGE_TCASTA}}) = ccall((:enum_EQUIPAGE_TCASTA, LIBCCAS),Int32,())
+get_equipage(::Type{Val{EQUIPAGE_TCAS}}) = ccall((:enum_EQUIPAGE_TCAS, LIBCCAS),Int32,())
 
 type OwnInputRef
   handle::Ptr{Void}
@@ -131,7 +125,7 @@ function set!(input::OwnInputRef, inputVals::OwnInput)
 end
 
 function set!(input::IntruderInputRef, iinputVals::IntruderInput)
-  equipage = EQUIPAGE_MAP[iinputVals.equipage]
+  equipage = get_equipage(Val{iinputVals.equipage})
   ccall((:setCIntruderInput, LIBCCAS), Void,
         (Ptr{Void}, Bool, Uint32, Uint32, Float64, Float64, Float64,
          Uint8, Uint8, Uint8, Int32, Uint8,
