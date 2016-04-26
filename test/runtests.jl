@@ -1,10 +1,10 @@
 using CASInterface
 using CCAS
 
-const LIBCAS = Pkg.dir("CCAS/libcas0.8.6/lib/libcas")
-const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas0.8.6/parameters/0.8.5.standard.r13.xa.config.txt")
+const LIBCAS = Pkg.dir("CCAS/libcas0.10.0/lib/libcas")
+const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas0.10.0/parameters/0.10.0.standard.r15_pre25iter93.xa.tcas.config.txt")
 
-function runtest(libcas::String=LIBCAS, libcas_config::String=LIBCAS_CONFIG)
+function runtest(libcas::AbstractString=LIBCAS, libcas_config::AbstractString=LIBCAS_CONFIG)
   println(author())
 
   consts = Constants(25, libcas_config, 1)
