@@ -1,8 +1,8 @@
 using CASInterface
 using CCAS
 
-const LIBCAS = Pkg.dir("CCAS/libcas0.10.0/lib/libcas")
-const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas0.10.0/parameters/0.10.0.standard.r15_pre25iter93.xa.tcas.config.txt")
+const LIBCAS = Pkg.dir("CCAS/libcas0.10.1/lib/libcas.so")
+const LIBCAS_CONFIG = Pkg.dir("CCAS/libcas0.10.1/parameters/0.10.1.standard.r15mtf.tcas.xa.config.txt")
 
 function runtest(libcas::AbstractString=LIBCAS, libcas_config::AbstractString=LIBCAS_CONFIG)
   println(author())
