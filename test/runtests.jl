@@ -94,6 +94,14 @@ function timingtest(libcas::AbstractString=LIBCAS,
     result
 end
 
+function estimate_cas_time(timingresult::Dict{ASCIIString,Any}, n_steps, n_iters, n_aircraft)
+    reset_s = mean(timingresult["reset"])
+    update_s = mean(timingresult["update"])
+    cas_time_s = (reset_s + n_steps*update_s) * n_iters * n_steps * n_aircraft
+    println("estimated cas time: $(cas_time_s) seconds, or $(cas_time_s/3600.0) hours")
+    cas_time_s
+end
+
 function runtest(libcas::AbstractString=LIBCAS, 
     libcas_config::AbstractString=LIBCAS_CONFIG)
     
