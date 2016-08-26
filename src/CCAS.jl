@@ -35,9 +35,9 @@
 module CCAS
 
 if WORD_SIZE == 32
-  const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas_x32.dll")
+  const LIBCCAS = @windows ? Pkg.dir("CCAS/libccas/lib/libccas_x32.dll") : @linux ? Pkg.dir("CCAS/libccas/lib/libccas_x32.so") : error("OS not supported")
 elseif WORD_SIZE == 64
-  const LIBCCAS = Pkg.dir("CCAS/libccas/lib/libccas_x64.dll")
+  const LIBCCAS = @windows ? Pkg.dir("CCAS/libccas/lib/libccas_x64.dll") : @linux ? Pkg.dir("CCAS/libccas/lib/libccas_x64.so") : error("OS not supported")
 else
   error("CCAS: Architecture must be 32-bit or 64-bit")
 end
