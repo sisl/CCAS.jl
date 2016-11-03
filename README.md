@@ -11,8 +11,6 @@ Ritchie Lee, ritchie.lee@sv.cmu.edu
 Dependencies: 
 
 * Libcas distribution
-* Boost C++ Libraries  >1.46.0
-* Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders, see Downloads section)
 * Visual Studio 2013 redistributable for Windows dll (Windows only)
 
 1. Clone CCAS package into your Julia packages folder.
@@ -24,6 +22,10 @@ Dependencies:
 
 ## Building libccas from source
 
+Dependencies:
+
+* Boost C++ Libraries  >1.46.0
+* Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders, see Downloads section)
 To build libccas from source (Windows):
 
 1. Go to CCAS/libccas/src/Build
