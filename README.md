@@ -1,6 +1,6 @@
 # CCAS
 
-CCAS is a Julia wrapper for the MIT-LL libcas (ACASX) C library and interface.  (libcas not included)
+CCAS is a Julia wrapper for the MIT-LL libcas (ACAS X) C library and interface.  (libcas not included)
 
 ## Authors
 
@@ -10,14 +10,19 @@ Ritchie Lee, ritchie.lee@sv.cmu.edu
 
 Dependencies: 
 
+* Libcas distribution
 * Boost C++ Libraries  >1.46.0
 * Boost::Extensions (Put the Extensions folder inside your Boost folder alongside the other component folders, see Downloads section)
-* LibCAS distribution
-* Visual Studio 2013 redistributable for Windows dll
+* Visual Studio 2013 redistributable for Windows dll (Windows only)
 
 1. Clone CCAS package into your Julia packages folder.
-1. Check under CCAS/libccas/lib for available precompiled libraries.  Choose the desired version and rename it to libccas.dll (libccas.lib is not required).  If the desired libraries are not available, then you will need to compile them from source (see below).  Default is Windows x64.
-1. When using the CCAS wrapper, you will need to provide (1) the path to the libcas configuration file, and (2) the path to the libcas library (e.g., libcas.dll in Windows).  Make sure to edit the configuration file so that the paths to the dependent parameter files are correct.
+1. Create a folder for the libcas distribution.  e.g., CCAS/libcas0.10.1, and create the following subfolders and put the corresponding libcas distribution files into the respective folders:
+  1. CCAS/libcas0.10.1/interface to contain all the .h header files
+  1. CCAS/libcas0.10.1/parameters to contain all the configuration files.
+  1. CCAS/libcas0.10.1/lib to contain the dll or so binary library.
+1. Edit the configuration file to use the absolute paths to the dependent parameter files. 
+
+## Building libccas from source
 
 To build libccas from source (Windows):
 
@@ -99,4 +104,4 @@ println( errorMsg == nothing ? "No Errors" : errorMsg )
 
 ***
 
-*Last Updated: 07/31/2015*
+*Last Updated: 11/3/2016*
