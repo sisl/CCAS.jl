@@ -34,10 +34,12 @@
 
 module CCAS
 
-if WORD_SIZE == 32
-  const LIBCCAS = @windows ? Pkg.dir("CCAS/libccas/lib/libccas_x32.dll") : @linux ? Pkg.dir("CCAS/libccas/lib/libccas_x32.so") : error("OS not supported")
-elseif WORD_SIZE == 64
-  const LIBCCAS = @windows ? Pkg.dir("CCAS/libccas/lib/libccas_x64.dll") : @linux ? Pkg.dir("CCAS/libccas/lib/libccas_x64.so") : error("OS not supported")
+using Compat
+
+if Sys.WORD_SIZE == 32
+  const LIBCCAS = is_windows() ? Pkg.dir("CCAS/libccas/lib/libccas_x32.dll") : is_linux() ? Pkg.dir("CCAS/libccas/lib/libccas_x32.so") : error("OS not supported")
+elseif Sys.WORD_SIZE == 64
+  const LIBCCAS = is_windows() ? Pkg.dir("CCAS/libccas/lib/libccas_x64.dll") : is_linux() ? Pkg.dir("CCAS/libccas/lib/libccas_x64.so") : error("OS not supported")
 else
   error("CCAS: Architecture must be 32-bit or 64-bit")
 end
@@ -301,12 +303,12 @@ end
 
 reset(cas::CASShared) = ccall((:reset, LIBCCAS), Void, (Ptr{Void},), cas.handle)
 
-version(cas::CASShared) = bytestring(ccall((:version, LIBCCAS), Ptr{UInt8}, (Ptr{Void},), cas.handle))
+version(cas::CASShared) = unsafe_string(ccall((:version, LIBCCAS), Ptr{UInt8}, (Ptr{Void},), cas.handle))
 
 function error_msg(cas::CASShared)
   err = ccall((:error, LIBCCAS), Ptr{UInt8},(Ptr{Void},), cas.handle)
 
-  return err == C_NULL ? nothing : bytestring(err)
+  return err == C_NULL ? nothing : unsafe_string(err)
 end
 
 max_intruders(cas::CASShared) = ccall((:max_intruders, LIBCCAS), Int64, (Ptr{Void},), cas.handle)
@@ -334,7 +336,7 @@ function checked_convert{T <: Unsigned}(::Type{T},n::Integer)
     convert(T,n) : error("Cannot convert numeric type: Out of range")
 end
 
-author() = bytestring(ccall((:author, LIBCCAS), Ptr{UInt8},()))
+author() = unsafe_string(ccall((:author, LIBCCAS), Ptr{UInt8},()))
 
 end
 
